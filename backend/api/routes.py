@@ -1,55 +1,87 @@
-from fastapi import APIRouter, Depends, UploadFile, File
+from fastapi import APIRouter, Depends, UploadFile, File, BackgroundTasks
 from sqlalchemy.orm import Session
 import pandas as pd
+import logging
 
-from backend.schemas.complaint import ComplaintRequest, ComplaintResponse
 from backend.core.deps import get_db
+from backend.core.database import SessionLocal
 from backend.models.complaint import Complaint
+from backend.services.analytics import get_summary
 from ml.engine import predict
 
-# 🔥 THIS MUST COME BEFORE ANY @router
 router = APIRouter()
-@router.post("/upload")
-def upload_csv(
-    file: UploadFile = File(...),
-    db: Session = Depends(get_db)
-):
-    try:
-        df = pd.read_csv(file.file)
+logger = logging.getLogger(__name__)
 
-        if "text" not in df.columns:
-            return {"error": "CSV must contain 'text' column"}
+
+# 🔥 BACKGROUND TASK FUNCTION
+def process_csv(file_path: str):
+    db = SessionLocal()  # ✅ NEW DB SESSION
+
+    try:
+        df = pd.read_csv(file_path)
+
+        required_cols = {"text", "created_at", "resolved_at"}
+        if not required_cols.issubset(df.columns):
+            logger.error("CSV missing required columns")
+            return
 
         logger.info(f"Processing {len(df)} records")
 
-        count = 0
-
         for _, row in df.iterrows():
-            text = row["text"]
+            text = str(row["text"])
 
-            if pd.isna(text) or not str(text).strip():
+            if not text.strip():
                 continue
 
-            text = str(text)
-
             prediction = predict(text)
+
+            created_at = pd.to_datetime(row["created_at"], errors="coerce")
+            resolved_at = (
+                pd.to_datetime(row["resolved_at"], errors="coerce")
+                if pd.notna(row["resolved_at"])
+                else None
+            )
 
             complaint = Complaint(
                 text=text,
                 category=prediction["category"],
-                confidence=prediction["confidence"]
+                confidence=prediction["confidence"],
+                created_at=created_at,
+                resolved_at=resolved_at
             )
 
             db.add(complaint)
-            count += 1
 
         db.commit()
-
-        return {
-            "message": "File processed successfully",
-            "processed_records": count
-        }
+        logger.info("CSV processing completed")
 
     except Exception as e:
-        logger.error(str(e))
-        return {"error": "File processing failed"}
+        logger.error(f"CSV processing failed: {str(e)}")
+
+    finally:
+        db.close()
+
+
+# 🔥 UPLOAD ENDPOINT
+@router.post("/upload")
+def upload_csv(
+    background_tasks: BackgroundTasks,
+    file: UploadFile = File(...)
+):
+    file_location = f"data/{file.filename}"
+
+    with open(file_location, "wb") as f:
+        f.write(file.file.read())
+
+    # ✅ Run in background (NO DB passed)
+    background_tasks.add_task(process_csv, file_location)
+
+    return {
+        "message": "File received. Processing in background."
+    }
+
+
+# 🔥 ANALYTICS ENDPOINT (ONLY ONCE)
+@router.get("/analytics/summary")
+def analytics_summary(db: Session = Depends(get_db)):
+    return get_summary(db)

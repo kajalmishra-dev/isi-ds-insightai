@@ -2,7 +2,6 @@ from sqlalchemy import Column, Integer, String, DateTime, Float
 from datetime import datetime
 from backend.core.database import Base
 
-
 class Complaint(Base):
     __tablename__ = "complaints"
 

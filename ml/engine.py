@@ -1,36 +1,59 @@
 import logging
 import joblib
-import os
 import numpy as np
+import os
 
-# Setup logging
-logging.basicConfig(level=logging.INFO)
+# ======================
+# LOGGING
+# ======================
 logger = logging.getLogger(__name__)
 
-MODEL_PATH = "ml/artifacts/model.joblib"
+# ======================
+# PATH
+# ======================
+MODEL_PATH = os.path.join("ml", "artifacts", "model.joblib")
 
 
 class ModelEngine:
     def __init__(self):
-        logger.info("Loading model...")
-        self.model = joblib.load(MODEL_PATH)
+        try:
+            logger.info("Loading model...")
+            self.model = joblib.load(MODEL_PATH)
+            logger.info("Model loaded successfully")
+
+        except Exception as e:
+            logger.error(f"Model loading failed: {str(e)}")
+            raise RuntimeError("Failed to load ML model")
 
     def predict(self, text: str):
-        if not text:
+        if not text or not text.strip():
             raise ValueError("Input text cannot be empty")
 
-        probs = self.model.predict_proba([text])[0]
-        classes = self.model.classes_
+        try:
+            probs = self.model.predict_proba([text])[0]
+            classes = self.model.classes_
 
-        max_idx = np.argmax(probs)
+            max_idx = int(np.argmax(probs))
 
-        return {
-            "category": classes[max_idx],
-            "confidence": float(probs[max_idx])
-        }
+            category = classes[max_idx]
+            confidence = float(probs[max_idx])
+
+            return {
+                "category": category,
+                "confidence": confidence
+            }
+
+        except Exception as e:
+            logger.error(f"Prediction failed: {str(e)}")
+            return {
+                "category": "error",
+                "confidence": 0.0
+            }
 
 
-# Load once (singleton pattern)
+# ======================
+# SINGLETON INSTANCE
+# ======================
 engine = ModelEngine()
 
 

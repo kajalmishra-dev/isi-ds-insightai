@@ -45,7 +45,7 @@ def process_csv(file_path: str):
             confidence = prediction["confidence"]
 
             # 🔥 CONFIDENCE THRESHOLD (IMPORTANT)
-            if confidence < 0.6:
+            if confidence < 0.3:
                 category = "needs_review"
             else:
                 category = prediction["category"]

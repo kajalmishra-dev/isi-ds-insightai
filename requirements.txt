@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+streamlit
+pandas
+sqlalchemy
+scikit-learn
+joblib
+plotly
+python-multipart

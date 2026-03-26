@@ -1,5 +1,12 @@
 venv/
 __pycache__/
 *.pyc
-insight.db
+*.pyo
+*.pyd
+
 ml/artifacts/
+data/
+insight.db
+
+.env
+.DS_Store

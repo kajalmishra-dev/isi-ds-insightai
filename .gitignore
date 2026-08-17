@@ -5,8 +5,9 @@ __pycache__/
 *.pyd
 
 ml/artifacts/
-data/
+data/uploads/
 insight.db
 
 .env
 .DS_Store
+.pytest_cache/

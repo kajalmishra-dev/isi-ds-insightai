@@ -1,61 +1,51 @@
 import logging
-import joblib
-import numpy as np
 import os
 
-# ======================
-# LOGGING
-# ======================
+import joblib
+import numpy as np
+
 logger = logging.getLogger(__name__)
 
-# ======================
-# PATH
-# ======================
 MODEL_PATH = os.path.join("ml", "artifacts", "model.joblib")
 
 
 class ModelEngine:
     def __init__(self):
-        try:
-            logger.info("Loading model...")
-            self.model = joblib.load(MODEL_PATH)
-            logger.info("Model loaded successfully")
+        if not os.path.exists(MODEL_PATH):
+            raise RuntimeError(
+                f"Model not found at {MODEL_PATH}. Run: python -m ml.train"
+            )
 
-        except Exception as e:
-            logger.error(f"Model loading failed: {str(e)}")
-            raise RuntimeError("Failed to load ML model")
+        logger.info("Loading model from %s", MODEL_PATH)
+        self.model = joblib.load(MODEL_PATH)
 
     def predict(self, text: str):
         if not text or not text.strip():
             raise ValueError("Input text cannot be empty")
 
-        try:
-            probs = self.model.predict_proba([text])[0]
-            classes = self.model.classes_
+        probs = self.model.predict_proba([text])[0]
+        classes = self.model.classes_
+        max_idx = int(np.argmax(probs))
 
-            max_idx = int(np.argmax(probs))
-
-            category = classes[max_idx]
-            confidence = float(probs[max_idx])
-
-            return {
-                "category": category,
-                "confidence": confidence
-            }
-
-        except Exception as e:
-            logger.error(f"Prediction failed: {str(e)}")
-            return {
-                "category": "error",
-                "confidence": 0.0
-            }
+        return {
+            "category": classes[max_idx],
+            "confidence": float(probs[max_idx]),
+        }
 
 
-# ======================
-# SINGLETON INSTANCE
-# ======================
-engine = ModelEngine()
+_engine = None
+
+
+def get_engine() -> ModelEngine:
+    global _engine
+    if _engine is None:
+        _engine = ModelEngine()
+    return _engine
 
 
 def predict(text: str):
-    return engine.predict(text)
+    try:
+        return get_engine().predict(text)
+    except Exception as exc:
+        logger.error("Prediction failed: %s", exc)
+        return {"category": "error", "confidence": 0.0}

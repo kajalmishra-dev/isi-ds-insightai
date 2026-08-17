@@ -1,18 +1,24 @@
+import logging
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
+
+from backend.api.routes import router
 from backend.core.database import engine
 from backend.models import complaint
-from backend.api.routes import router
 
-import logging
 logging.basicConfig(level=logging.INFO)
 
-# Create tables
-complaint.Base.metadata.create_all(bind=engine)
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    complaint.Base.metadata.create_all(bind=engine)
+    yield
 
-# include all routes
+
+app = FastAPI(title="InsightAI", lifespan=lifespan)
 app.include_router(router)
+
 
 @app.get("/health")
 def health():

@@ -1,8 +1,13 @@
-from fastapi import APIRouter, Depends, UploadFile, File, BackgroundTasks
+import logging
+import os
+from pathlib import Path
+from uuid import uuid4
+
+from fastapi import APIRouter, BackgroundTasks, Depends, File, UploadFile
 from sqlalchemy.orm import Session
 import pandas as pd
-import logging
 
+from backend.core.config import settings
 from backend.core.deps import get_db
 from backend.core.database import SessionLocal
 from backend.models.complaint import Complaint
@@ -13,16 +18,18 @@ router = APIRouter()
 logger = logging.getLogger(__name__)
 
 
-# =========================
-# 🔥 BACKGROUND TASK
-# =========================
+def _safe_upload_path(filename: str) -> Path:
+    upload_root = Path(settings.upload_dir)
+    upload_root.mkdir(parents=True, exist_ok=True)
+    safe_name = Path(filename).name
+    return upload_root / f"{uuid4().hex}_{safe_name}"
+
+
 def process_csv(file_path: str):
     db = SessionLocal()
 
     try:
         df = pd.read_csv(file_path)
-
-        # ✅ VALIDATION
         required_cols = {"text", "created_at", "resolved_at"}
         if not required_cols.issubset(df.columns):
             logger.error("CSV missing required columns")
@@ -32,25 +39,21 @@ def process_csv(file_path: str):
             logger.warning("CSV is empty")
             return
 
-        logger.info(f"Processing {len(df)} records")
+        logger.info("Processing %s records", len(df))
 
         for _, row in df.iterrows():
             text = str(row["text"])
-
             if not text.strip():
                 continue
 
-            # 🔥 ML PREDICTION
             prediction = predict(text)
             confidence = prediction["confidence"]
 
-            # 🔥 CONFIDENCE THRESHOLD (IMPORTANT)
-            if confidence < 0.3:
+            if confidence < settings.confidence_threshold:
                 category = "needs_review"
             else:
                 category = prediction["category"]
 
-            # 🔥 DATE HANDLING
             created_at = pd.to_datetime(row["created_at"], errors="coerce")
             resolved_at = (
                 pd.to_datetime(row["resolved_at"], errors="coerce")
@@ -58,68 +61,60 @@ def process_csv(file_path: str):
                 else None
             )
 
-            complaint = Complaint(
-                text=text,
-                category=category,
-                confidence=confidence,
-                created_at=created_at,
-                resolved_at=resolved_at
+            db.add(
+                Complaint(
+                    text=text,
+                    category=category,
+                    confidence=confidence,
+                    created_at=created_at,
+                    resolved_at=resolved_at,
+                )
             )
-
-            db.add(complaint)
 
         db.commit()
         logger.info("CSV processing completed")
 
-    except Exception as e:
-        logger.error(f"CSV processing failed: {str(e)}")
+    except Exception as exc:
+        logger.error("CSV processing failed: %s", exc)
+        db.rollback()
 
     finally:
         db.close()
 
 
-# =========================
-# 🔥 UPLOAD ENDPOINT
-# =========================
 @router.post("/upload")
 def upload_csv(
     background_tasks: BackgroundTasks,
-    file: UploadFile = File(...)
+    file: UploadFile = File(...),
 ):
-    file_location = f"data/{file.filename}"
+    destination = _safe_upload_path(file.filename or "upload.csv")
+    with destination.open("wb") as handle:
+        handle.write(file.file.read())
 
-    with open(file_location, "wb") as f:
-        f.write(file.file.read())
+    if os.getenv("TESTING") == "1":
+        process_csv(str(destination))
+    else:
+        background_tasks.add_task(process_csv, str(destination))
 
-    background_tasks.add_task(process_csv, file_location)
-
-    return {
-        "message": "File received. Processing in background."
-    }
+    return {"message": "File received. Processing in background."}
 
 
-# =========================
-# 🔥 ANALYTICS
-# =========================
 @router.get("/analytics/summary")
 def analytics_summary(db: Session = Depends(get_db)):
     return get_summary(db)
 
 
-# =========================
-# 🔥 RECENT COMPLAINTS
-# =========================
 @router.get("/complaints")
 def get_complaints(db: Session = Depends(get_db)):
     data = db.query(Complaint).order_by(Complaint.id.desc()).limit(100).all()
 
     return [
         {
-            "text": c.text,
-            "category": c.category,
-            "confidence": c.confidence,
-            "created_at": c.created_at,
-            "resolved_at": c.resolved_at
+            "text": complaint.text,
+            "category": complaint.category,
+            "confidence": complaint.confidence,
+            "created_at": complaint.created_at,
+            "resolved_at": complaint.resolved_at,
         }
-        for c in data
+        for complaint in data
     ]

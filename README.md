@@ -33,7 +33,7 @@ It is designed as a **production-style pipeline** combining:
 * 🗄️ **Database Storage**
 
   * SQLAlchemy ORM
-  * SQLite (dev), PostgreSQL-ready
+  * SQLite by default (`DATABASE_URL` configurable)
 
 * 📊 **Analytics Dashboard**
 

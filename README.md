@@ -15,6 +15,7 @@ Production-style system for complaint ingestion, ML classification, review queue
 - Analytics KPIs + **computed insights** (never hardcoded fake observations)
 - Complaint explorer with search/sort/filters + **CSV export**
 - Live classify with `model_version` + alternative scores
+- Sidebar **sample CSV download** + **feature guide PDF** for demos
 - Optional **API key auth**, CORS, request IDs, response timing, readiness probes
 - Docker Compose deployment with persisted DB/uploads volume
 
@@ -49,6 +50,7 @@ streamlit run frontend/app.py
 - API docs: http://127.0.0.1:8000/docs  
 - Dashboard: http://127.0.0.1:8501  
 - Sample upload file: `data/sample_upload.csv` (**48 held-out texts** - use this in the UI)
+- Feature guide PDF: `docs/InsightAI_Feature_Guide.pdf` (also downloadable from the sidebar)
 - Training labels live in `data/complaints.csv` (**240 rows**, 60×4) - for `python -m ml.train` only, not for demo upload
 - If the dashboard shows junk / 100% review from old runs: stop API → `python scripts/reset_local_db.py` → restart → upload `sample_upload.csv`
 

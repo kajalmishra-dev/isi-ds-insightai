@@ -1,0 +1,249 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R 6 0 R 8 0 R 10 0 R] /Count 4 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 5 0 R /Resources << /Font << /F1 3 0 R >> >> >>
+endobj
+5 0 obj
+<< /Length 1051 >>
+stream
+BT
+/F1 11 Tf
+50 750 Td
+/F1 20 Tf
+(InsightAI Feature Guide) Tj
+0 -14 Td
+/F1 11 Tf
+(Complaint intelligence for classify, review, and SLA tracking.) Tj
+0 -14 Td
+/F1 11 Tf
+(Version 2.1 - demo walkthrough for operators and stakeholders.) Tj
+0 -14 Td
+/F1 11 Tf
+() Tj
+0 -18 Td
+/F1 13 Tf
+(1. What InsightAI does) Tj
+0 -14 Td
+/F1 11 Tf
+(Upload a CSV of complaint texts. The model classifies each row into) Tj
+0 -14 Td
+/F1 11 Tf
+(Billing, Shipping, Service, or Technical, scores confidence, and flags) Tj
+0 -14 Td
+/F1 11 Tf
+(low-confidence rows for human review. Analytics track volume, mix,) Tj
+0 -14 Td
+/F1 11 Tf
+(resolution SLAs, and system alerts.) Tj
+0 -14 Td
+/F1 11 Tf
+() Tj
+0 -18 Td
+/F1 13 Tf
+(2. Quick demo path) Tj
+0 -14 Td
+/F1 11 Tf
+(- Download sample CSV from the sidebar \(48 held-out complaints\).) Tj
+0 -14 Td
+/F1 11 Tf
+(- Click Upload, select the file, then Ingest data.) Tj
+0 -14 Td
+/F1 11 Tf
+(- Wait for the job to complete, then open Overview.) Tj
+0 -14 Td
+/F1 11 Tf
+(- Triage Needs Review items, then explore filters and Live Classify.) Tj
+ET
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 7 0 R /Resources << /Font << /F1 3 0 R >> >> >>
+endobj
+7 0 obj
+<< /Length 924 >>
+stream
+BT
+/F1 11 Tf
+50 750 Td
+/F1 13 Tf
+(3. Overview) Tj
+0 -14 Td
+/F1 11 Tf
+(KPI cards: total complaints, resolved under 24h, needs-review count,) Tj
+0 -14 Td
+/F1 11 Tf
+(and median resolution time. Semantic colors \(red/amber\) appear only for) Tj
+0 -14 Td
+/F1 11 Tf
+(risk states on Needs Review - not decoration.) Tj
+0 -14 Td
+/F1 11 Tf
+() Tj
+0 -14 Td
+/F1 11 Tf
+(System alerts highlight actionable anomalies \(review overload, weak) Tj
+0 -14 Td
+/F1 11 Tf
+(class confidence, SLA risk\).) Tj
+0 -14 Td
+/F1 11 Tf
+() Tj
+0 -14 Td
+/F1 11 Tf
+(Charts: colored category bars plus a donut mix so volume share is) Tj
+0 -14 Td
+/F1 11 Tf
+(obvious at a glance. Recent ingestion jobs sit beside the charts with) Tj
+0 -14 Td
+/F1 11 Tf
+(export and retry when a run fails.) Tj
+0 -14 Td
+/F1 11 Tf
+() Tj
+0 -14 Td
+/F1 11 Tf
+(If Needs Review is above zero, use Triage pending reviews to jump) Tj
+0 -14 Td
+/F1 11 Tf
+(straight into the Review Queue.) Tj
+ET
+endstream
+endobj
+8 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 9 0 R /Resources << /Font << /F1 3 0 R >> >> >>
+endobj
+9 0 obj
+<< /Length 960 >>
+stream
+BT
+/F1 11 Tf
+50 750 Td
+/F1 13 Tf
+(4. Review Queue) Tj
+0 -14 Td
+/F1 11 Tf
+(Lists low-confidence complaints, lowest confidence first. Click a row) Tj
+0 -14 Td
+/F1 11 Tf
+(to open Triage. The dropdown defaults to the model suggestion so you) Tj
+0 -14 Td
+/F1 11 Tf
+(can Approve / Submit in one click when the label is correct, or change) Tj
+0 -14 Td
+/F1 11 Tf
+(the category when it is not.) Tj
+0 -14 Td
+/F1 11 Tf
+() Tj
+0 -14 Td
+/F1 11 Tf
+(Each submit clears needs_review and marks the row human_reviewed so) Tj
+0 -14 Td
+/F1 11 Tf
+(Overview can show how many labels you corrected for future retraining.) Tj
+0 -14 Td
+/F1 11 Tf
+() Tj
+0 -14 Td
+/F1 11 Tf
+(When the queue is empty, return to Overview for refreshed KPIs.) Tj
+0 -14 Td
+/F1 11 Tf
+() Tj
+0 -18 Td
+/F1 13 Tf
+(5. Complaint Explorer) Tj
+0 -14 Td
+/F1 11 Tf
+(Search and filter by category, review status, and sort. Export CSV uses) Tj
+0 -14 Td
+/F1 11 Tf
+(the active filters. Pagination sits under the table.) Tj
+ET
+endstream
+endobj
+10 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 11 0 R /Resources << /Font << /F1 3 0 R >> >> >>
+endobj
+11 0 obj
+<< /Length 1079 >>
+stream
+BT
+/F1 11 Tf
+50 750 Td
+/F1 13 Tf
+(6. Live Classification) Tj
+0 -14 Td
+/F1 11 Tf
+(Paste any complaint \(or pick a sample chip\) and Classify. The result) Tj
+0 -14 Td
+/F1 11 Tf
+(card shows the primary category badge, confidence percent with a bar,) Tj
+0 -14 Td
+/F1 11 Tf
+(and runner-up alternatives so you can see model uncertainty live.) Tj
+0 -14 Td
+/F1 11 Tf
+() Tj
+0 -18 Td
+/F1 13 Tf
+(7. Sidebar) Tj
+0 -14 Td
+/F1 11 Tf
+(- Status dot: API online/offline.) Tj
+0 -14 Td
+/F1 11 Tf
+(- Download sample CSV: safe demo file \(not the training set\).) Tj
+0 -14 Td
+/F1 11 Tf
+(- Feature guide PDF: this document.) Tj
+0 -14 Td
+/F1 11 Tf
+(- Upload + Ingest: start a classification job.) Tj
+0 -14 Td
+/F1 11 Tf
+(- Settings: optional API key when AUTH_ENABLED=true.) Tj
+0 -14 Td
+/F1 11 Tf
+(- Footer: app version and loaded model tag.) Tj
+0 -14 Td
+/F1 11 Tf
+() Tj
+0 -18 Td
+/F1 13 Tf
+(8. Data notes) Tj
+0 -14 Td
+/F1 11 Tf
+(sample_upload.csv is held-out demo text. complaints.csv is for training) Tj
+0 -14 Td
+/F1 11 Tf
+(only \(python -m ml.train\). Do not upload the training file as a demo.) Tj
+ET
+endstream
+endobj
+xref
+0 12
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000134 00000 n 
+0000000204 00000 n 
+0000000330 00000 n 
+0000001433 00000 n 
+0000001559 00000 n 
+0000002534 00000 n 
+0000002660 00000 n 
+0000003671 00000 n 
+0000003799 00000 n 
+trailer<< /Size 12 /Root 1 0 R >>
+startxref
+4931
+%%EOF

@@ -1,101 +1,241 @@
 text,category,created_at,resolved_at
-App crashes on login screen,technical,2026-01-02 09:00:00,2026-01-02 11:00:00
-Cannot reset my password,technical,2026-01-02 14:00:00,2026-01-02 19:00:00
-Dashboard keeps showing error 500,technical,2026-01-02 19:00:00,2026-01-03 07:00:00
-Mobile app freezes after update,technical,2026-01-03 00:00:00,2026-01-03 20:00:00
-Two factor authentication not working,technical,2026-01-03 05:00:00,2026-01-04 11:00:00
-Server timeout during file upload,technical,2026-01-03 10:00:00,2026-01-05 10:00:00
-API integration returns invalid token,technical,2026-01-03 15:00:00,2026-01-06 15:00:00
-Notification emails not being sent,technical,2026-01-03 20:00:00,2026-01-08 20:00:00
-Session expires immediately after login,technical,2026-01-04 01:00:00,2026-01-04 03:00:00
-Search results never load on the portal,technical,2026-01-04 06:00:00,2026-01-04 11:00:00
-Push notifications duplicate every minute,technical,2026-01-04 11:00:00,2026-01-04 23:00:00
-Dark mode breaks the settings page layout,technical,2026-01-04 16:00:00,2026-01-05 12:00:00
-OTP code never arrives on my phone,technical,2026-01-04 21:00:00,2026-01-06 03:00:00
-Profile photo upload fails with network error,technical,2026-01-05 02:00:00,2026-01-07 02:00:00
-Websocket disconnects during live chat,technical,2026-01-05 07:00:00,2026-01-08 07:00:00
-Report export downloads a corrupted file,technical,2026-01-05 12:00:00,2026-01-10 12:00:00
-SSO login redirects to a blank page,technical,2026-01-05 17:00:00,2026-01-05 19:00:00
-Browser console shows CORS failures,technical,2026-01-05 22:00:00,2026-01-06 03:00:00
-Keyboard shortcuts stop working after refresh,technical,2026-01-06 03:00:00,2026-01-06 15:00:00
-Attachment preview is stuck on loading spinner,technical,2026-01-06 08:00:00,2026-01-07 04:00:00
-Calendar sync fails with Google account,technical,2026-01-06 13:00:00,2026-01-07 19:00:00
-App crashes when switching workspaces,technical,2026-01-06 18:00:00,2026-01-08 18:00:00
-Form submit button remains disabled forever,technical,2026-01-06 23:00:00,2026-01-09 23:00:00
-Infinite redirect loop on admin console,technical,2026-01-07 04:00:00,2026-01-12 04:00:00
-Latency spikes make the UI unusable,technical,2026-01-07 09:00:00,2026-01-07 11:00:00
-Payment failed but money was deducted,billing,2026-01-07 14:00:00,2026-01-07 19:00:00
-Invoice amount is incorrect,billing,2026-01-07 19:00:00,2026-01-08 07:00:00
-Charged twice for same subscription,billing,2026-01-08 00:00:00,2026-01-08 20:00:00
-Promo code did not apply at checkout,billing,2026-01-08 05:00:00,2026-01-09 11:00:00
-Tax was calculated incorrectly,billing,2026-01-08 10:00:00,2026-01-10 10:00:00
-Annual plan renewed without notice,billing,2026-01-08 15:00:00,2026-01-11 15:00:00
-Refund still pending after 10 days,billing,2026-01-08 20:00:00,2026-01-13 20:00:00
-Card declined despite sufficient balance,billing,2026-01-09 01:00:00,2026-01-09 03:00:00
-Wrong currency shown on my invoice,billing,2026-01-09 06:00:00,2026-01-09 11:00:00
-Discount disappeared after trial ended,billing,2026-01-09 11:00:00,2026-01-09 23:00:00
-Proration credit missing after downgrade,billing,2026-01-09 16:00:00,2026-01-10 12:00:00
-VAT ID was not accepted at checkout,billing,2026-01-09 21:00:00,2026-01-11 03:00:00
-Subscription cancelled but still billed,billing,2026-01-10 02:00:00,2026-01-12 02:00:00
-Payment method update keeps failing,billing,2026-01-10 07:00:00,2026-01-13 07:00:00
-Receipt email has the wrong company name,billing,2026-01-10 12:00:00,2026-01-15 12:00:00
-Seat count billed higher than active users,billing,2026-01-10 17:00:00,2026-01-10 19:00:00
-Chargeback opened for unrecognized payment,billing,2026-01-10 22:00:00,2026-01-11 03:00:00
-Invoice PDF is missing line items,billing,2026-01-11 03:00:00,2026-01-11 15:00:00
-Auto-renew charged after cancellation request,billing,2026-01-11 08:00:00,2026-01-12 04:00:00
-Wallet balance not applied to the order,billing,2026-01-11 13:00:00,2026-01-12 19:00:00
-Partial refund never posted to my card,billing,2026-01-11 18:00:00,2026-01-13 18:00:00
-Price increased mid-contract without consent,billing,2026-01-11 23:00:00,2026-01-14 23:00:00
-Billing address cannot be edited,billing,2026-01-12 04:00:00,2026-01-17 04:00:00
-Duplicate tax applied on international order,billing,2026-01-12 09:00:00,2026-01-12 11:00:00
-Credits expired earlier than stated policy,billing,2026-01-12 14:00:00,2026-01-12 19:00:00
-Delivery arrived two days late,shipping,2026-01-12 19:00:00,2026-01-13 07:00:00
-Package marked delivered but missing,shipping,2026-01-13 00:00:00,2026-01-13 20:00:00
-Wrong item shipped to my address,shipping,2026-01-13 05:00:00,2026-01-14 11:00:00
-Tracking number never updated,shipping,2026-01-13 10:00:00,2026-01-15 10:00:00
-Courier left package in rain,shipping,2026-01-13 15:00:00,2026-01-16 15:00:00
-Address update not reflected in order,shipping,2026-01-13 20:00:00,2026-01-18 20:00:00
-Express shipping took five days,shipping,2026-01-14 01:00:00,2026-01-14 03:00:00
-Parcel damaged on arrival,shipping,2026-01-14 06:00:00,2026-01-14 11:00:00
-Label created but package not picked up,shipping,2026-01-14 11:00:00,2026-01-14 23:00:00
-Wrong warehouse fulfilled my order,shipping,2026-01-14 16:00:00,2026-01-15 12:00:00
-Customs delay with no status update,shipping,2026-01-14 21:00:00,2026-01-16 03:00:00
-Delivery attempted without doorbell ring,shipping,2026-01-15 02:00:00,2026-01-17 02:00:00
-Returned to sender without my request,shipping,2026-01-15 07:00:00,2026-01-18 07:00:00
-"Fragile sticker ignored, item broken",shipping,2026-01-15 12:00:00,2026-01-20 12:00:00
-Split shipment arrived incomplete,shipping,2026-01-15 17:00:00,2026-01-15 19:00:00
-Pickup point closed when I arrived,shipping,2026-01-15 22:00:00,2026-01-16 03:00:00
-Driver refused to wait for signature,shipping,2026-01-16 03:00:00,2026-01-16 15:00:00
-Box opened and resealed before delivery,shipping,2026-01-16 08:00:00,2026-01-17 04:00:00
-Shipping estimate jumped after payment,shipping,2026-01-16 13:00:00,2026-01-17 19:00:00
-Order stuck in transit for two weeks,shipping,2026-01-16 18:00:00,2026-01-18 18:00:00
-Wrong size variant packed in the box,shipping,2026-01-16 23:00:00,2026-01-19 23:00:00
-Missing accessories in the package,shipping,2026-01-17 04:00:00,2026-01-22 04:00:00
-Overnight shipping delivered next week,shipping,2026-01-17 09:00:00,2026-01-17 11:00:00
-Tracking shows delivered to wrong city,shipping,2026-01-17 14:00:00,2026-01-17 19:00:00
-Carrier lost the package mid-route,shipping,2026-01-17 19:00:00,2026-01-18 07:00:00
-Support agent was rude on call,service,2026-01-18 00:00:00,2026-01-18 20:00:00
-Long hold time with no resolution,service,2026-01-18 05:00:00,2026-01-19 11:00:00
-Refund request ignored for a week,service,2026-01-18 10:00:00,2026-01-20 10:00:00
-Chat support disconnected repeatedly,service,2026-01-18 15:00:00,2026-01-21 15:00:00
-Escalation ticket closed without fix,service,2026-01-18 20:00:00,2026-01-23 20:00:00
-Agent promised callback but never called,service,2026-01-19 01:00:00,2026-01-19 03:00:00
-Complaint marked resolved but issue remains,service,2026-01-19 06:00:00,2026-01-19 11:00:00
-No response to priority support email,service,2026-01-19 11:00:00,2026-01-19 23:00:00
-Ticket reassigned five times with no owner,service,2026-01-19 16:00:00,2026-01-20 12:00:00
-Knowledge base article is outdated,service,2026-01-19 21:00:00,2026-01-21 03:00:00
-Support refused to escalate to engineering,service,2026-01-20 02:00:00,2026-01-22 02:00:00
-Agent asked me to repeat details three times,service,2026-01-20 07:00:00,2026-01-23 07:00:00
-Case closed after automated reply only,service,2026-01-20 12:00:00,2026-01-25 12:00:00
-Weekend support is unavailable despite plan,service,2026-01-20 17:00:00,2026-01-20 19:00:00
-Chatbot loops and never opens a human ticket,service,2026-01-20 22:00:00,2026-01-21 03:00:00
-Manager review promised but never scheduled,service,2026-01-21 03:00:00,2026-01-21 15:00:00
-SLA breached with no apology or update,service,2026-01-21 08:00:00,2026-01-22 04:00:00
-Agent shared incorrect troubleshooting steps,service,2026-01-21 13:00:00,2026-01-22 19:00:00
-Phone menu has no option for billing help,service,2026-01-21 18:00:00,2026-01-23 18:00:00
-Support language pack missing for my region,service,2026-01-21 23:00:00,2026-01-24 23:00:00
-Follow-up email bounced from support alias,service,2026-01-22 04:00:00,2026-01-27 04:00:00
-Priority queue still waited over four hours,service,2026-01-22 09:00:00,2026-01-22 11:00:00
-Agent hung up during active troubleshooting,service,2026-01-22 14:00:00,2026-01-22 19:00:00
-Community forum moderation ignored report,service,2026-01-22 19:00:00,2026-01-23 07:00:00
-Onboarding specialist missed the scheduled call,service,2026-01-23 00:00:00,2026-01-23 20:00:00
+App crashes on the login screen every time,technical,2026-01-02 09:00:00,2026-01-02 12:00:00
+Cannot reset my password from the account page,technical,2026-01-02 12:00:00,2026-01-02 18:00:00
+Dashboard keeps showing HTTP error 500,technical,2026-01-02 15:00:00,2026-01-03 01:00:00
+Mobile app freezes after the latest update,technical,2026-01-02 18:00:00,2026-01-03 10:00:00
+Two factor authentication code never validates,technical,2026-01-02 21:00:00,2026-01-03 19:00:00
+Server timeout during large file upload,technical,2026-01-03 00:00:00,2026-01-04 04:00:00
+API integration returns an invalid OAuth token,technical,2026-01-03 03:00:00,2026-01-04 15:00:00
+Notification emails are not being sent at all,technical,2026-01-03 06:00:00,2026-01-05 06:00:00
+Session expires immediately after successful login,technical,2026-01-03 09:00:00,2026-01-05 21:00:00
+Search results never load on the customer portal,technical,2026-01-03 12:00:00,2026-01-06 12:00:00
+Push notifications duplicate every single minute,technical,2026-01-03 15:00:00,2026-01-07 15:00:00
+Dark mode breaks the settings page layout,technical,2026-01-03 18:00:00,2026-01-08 18:00:00
+OTP SMS code never arrives on my phone,technical,2026-01-03 21:00:00,2026-01-04 00:00:00
+Profile photo upload fails with a network error,technical,2026-01-04 00:00:00,2026-01-04 06:00:00
+Websocket disconnects during live support chat,technical,2026-01-04 03:00:00,2026-01-04 13:00:00
+Report export downloads a corrupted ZIP file,technical,2026-01-04 06:00:00,2026-01-04 22:00:00
+SSO login redirects to a blank white page,technical,2026-01-04 09:00:00,2026-01-05 07:00:00
+Browser console shows repeated CORS failures,technical,2026-01-04 12:00:00,2026-01-05 16:00:00
+Keyboard shortcuts stop working after refresh,technical,2026-01-04 15:00:00,2026-01-06 03:00:00
+Attachment preview is stuck on loading spinner,technical,2026-01-04 18:00:00,2026-01-06 18:00:00
+Calendar sync fails with my Google Workspace account,technical,2026-01-04 21:00:00,2026-01-07 09:00:00
+App crashes when switching between workspaces,technical,2026-01-05 00:00:00,2026-01-08 00:00:00
+Form submit button remains disabled forever,technical,2026-01-05 03:00:00,2026-01-09 03:00:00
+Infinite redirect loop on the admin console,technical,2026-01-05 06:00:00,2026-01-10 06:00:00
+Latency spikes make the entire UI unusable,technical,2026-01-05 09:00:00,2026-01-05 12:00:00
+Database query times out on the reports screen,technical,2026-01-05 12:00:00,2026-01-05 18:00:00
+Mobile crash dump appears after opening Messages,technical,2026-01-05 15:00:00,2026-01-06 01:00:00
+Feature flag toggle does not persist after reload,technical,2026-01-05 18:00:00,2026-01-06 10:00:00
+GraphQL endpoint returns 401 for valid API keys,technical,2026-01-05 21:00:00,2026-01-06 19:00:00
+iOS build crashes on launch after MDM install,technical,2026-01-06 00:00:00,2026-01-07 04:00:00
+Android app black screens on biometric unlock,technical,2026-01-06 03:00:00,2026-01-07 15:00:00
+CSV mapper throws a schema validation exception,technical,2026-01-06 06:00:00,2026-01-08 06:00:00
+Background job worker keeps restarting with OOM,technical,2026-01-06 09:00:00,2026-01-08 21:00:00
+SSL certificate warning blocks the secure portal,technical,2026-01-06 12:00:00,2026-01-09 12:00:00
+Webhook retries exhaust and never deliver events,technical,2026-01-06 15:00:00,2026-01-10 15:00:00
+Search index is stale and missing new tickets,technical,2026-01-06 18:00:00,2026-01-11 18:00:00
+PDF renderer fails for multi-page invoices,technical,2026-01-06 21:00:00,2026-01-07 00:00:00
+Desktop client cannot reconnect after sleep mode,technical,2026-01-07 00:00:00,2026-01-07 06:00:00
+Rate limiter blocks legitimate automation scripts,technical,2026-01-07 03:00:00,2026-01-07 13:00:00
+Image OCR pipeline returns empty text results,technical,2026-01-07 06:00:00,2026-01-07 22:00:00
+Audit log viewer throws a JavaScript TypeError,technical,2026-01-07 09:00:00,2026-01-08 07:00:00
+SAML assertion clock skew rejects my IdP login,technical,2026-01-07 12:00:00,2026-01-08 16:00:00
+CDN cache serves an outdated JavaScript bundle,technical,2026-01-07 15:00:00,2026-01-09 03:00:00
+Pagination API skips pages when sorting by date,technical,2026-01-07 18:00:00,2026-01-09 18:00:00
+File virus scanner false-positives every upload,technical,2026-01-07 21:00:00,2026-01-10 09:00:00
+Mobile deep link opens the wrong product screen,technical,2026-01-08 00:00:00,2026-01-11 00:00:00
+Telemetry SDK crashes the app in airplane mode,technical,2026-01-08 03:00:00,2026-01-12 03:00:00
+Admin role permission check returns false negatives,technical,2026-01-08 06:00:00,2026-01-13 06:00:00
+Websocket backlog causes delayed live metrics,technical,2026-01-08 09:00:00,2026-01-08 12:00:00
+Python SDK example fails against the v2 API,technical,2026-01-08 12:00:00,2026-01-08 18:00:00
+Passwordless magic link lands on a 404 route,technical,2026-01-08 15:00:00,2026-01-09 01:00:00
+Browser extension conflicts and breaks autofill,technical,2026-01-08 18:00:00,2026-01-09 10:00:00
+GPU acceleration toggle freezes the canvas editor,technical,2026-01-08 21:00:00,2026-01-09 19:00:00
+Health check endpoint flaps every few minutes,technical,2026-01-09 00:00:00,2026-01-10 04:00:00
+Message queue consumer stalls and stops processing,technical,2026-01-09 03:00:00,2026-01-10 15:00:00
+Local cache corruption forces a full reinstall,technical,2026-01-09 06:00:00,2026-01-11 06:00:00
+Timezone conversion bug shifts meeting times by hours,technical,2026-01-09 09:00:00,2026-01-11 21:00:00
+Drag and drop upload never finishes on Safari,technical,2026-01-09 12:00:00,2026-01-12 12:00:00
+CLI login device flow hangs waiting for approval,technical,2026-01-09 15:00:00,2026-01-13 15:00:00
+Hotfix deploy left the frontend on a blank route,technical,2026-01-09 18:00:00,2026-01-14 18:00:00
+Payment failed but the money was still deducted,billing,2026-01-09 21:00:00,2026-01-10 00:00:00
+Invoice amount is incorrect on my latest bill,billing,2026-01-10 00:00:00,2026-01-10 06:00:00
+I was charged twice for the same subscription,billing,2026-01-10 03:00:00,2026-01-10 13:00:00
+Promo code did not apply at checkout,billing,2026-01-10 06:00:00,2026-01-10 22:00:00
+Sales tax was calculated incorrectly on my order,billing,2026-01-10 09:00:00,2026-01-11 07:00:00
+Annual plan renewed without any prior notice,billing,2026-01-10 12:00:00,2026-01-11 16:00:00
+Refund is still pending after ten business days,billing,2026-01-10 15:00:00,2026-01-12 03:00:00
+Card was declined despite sufficient balance,billing,2026-01-10 18:00:00,2026-01-12 18:00:00
+Wrong currency is shown on my invoice PDF,billing,2026-01-10 21:00:00,2026-01-13 09:00:00
+Discount disappeared right after the trial ended,billing,2026-01-11 00:00:00,2026-01-14 00:00:00
+Proration credit is missing after my downgrade,billing,2026-01-11 03:00:00,2026-01-15 03:00:00
+VAT ID was not accepted at checkout,billing,2026-01-11 06:00:00,2026-01-16 06:00:00
+Subscription was cancelled but I am still billed,billing,2026-01-11 09:00:00,2026-01-11 12:00:00
+Payment method update keeps failing with decline,billing,2026-01-11 12:00:00,2026-01-11 18:00:00
+Receipt email has the wrong company legal name,billing,2026-01-11 15:00:00,2026-01-12 01:00:00
+Seat count billed higher than active users,billing,2026-01-11 18:00:00,2026-01-12 10:00:00
+Chargeback opened for an unrecognized payment,billing,2026-01-11 21:00:00,2026-01-12 19:00:00
+Invoice PDF is missing several line items,billing,2026-01-12 00:00:00,2026-01-13 04:00:00
+Auto-renew charged after my cancellation request,billing,2026-01-12 03:00:00,2026-01-13 15:00:00
+Wallet balance was not applied to the order total,billing,2026-01-12 06:00:00,2026-01-14 06:00:00
+Partial refund never posted back to my card,billing,2026-01-12 09:00:00,2026-01-14 21:00:00
+Price increased mid-contract without my consent,billing,2026-01-12 12:00:00,2026-01-15 12:00:00
+Billing address cannot be edited in account settings,billing,2026-01-12 15:00:00,2026-01-16 15:00:00
+Duplicate tax applied on an international order,billing,2026-01-12 18:00:00,2026-01-17 18:00:00
+Store credits expired earlier than the stated policy,billing,2026-01-12 21:00:00,2026-01-13 00:00:00
+I need a corrected invoice for accounting close,billing,2026-01-13 00:00:00,2026-01-13 06:00:00
+ACH payment shows pending for over a week,billing,2026-01-13 03:00:00,2026-01-13 13:00:00
+Wire transfer fee was added without disclosure,billing,2026-01-13 06:00:00,2026-01-13 22:00:00
+Usage overage charges look inflated this month,billing,2026-01-13 09:00:00,2026-01-14 07:00:00
+Coupon stacking rules blocked a valid partner code,billing,2026-01-13 12:00:00,2026-01-14 16:00:00
+Finance asked for a W-9 but the portal upload fails,billing,2026-01-13 15:00:00,2026-01-15 03:00:00
+Monthly statement does not match my bank charges,billing,2026-01-13 18:00:00,2026-01-15 18:00:00
+Free tier limit triggered a surprise paid upgrade,billing,2026-01-13 21:00:00,2026-01-16 09:00:00
+Credit memo was promised but never issued,billing,2026-01-14 00:00:00,2026-01-17 00:00:00
+Billing contact email cannot be changed by admin,billing,2026-01-14 03:00:00,2026-01-18 03:00:00
+Trial conversion charged before the trial end date,billing,2026-01-14 06:00:00,2026-01-19 06:00:00
+Multi-year discount was removed on renewal,billing,2026-01-14 09:00:00,2026-01-14 12:00:00
+Payment intent succeeded twice for one checkout,billing,2026-01-14 12:00:00,2026-01-14 18:00:00
+Currency conversion rate looks outdated on invoice,billing,2026-01-14 15:00:00,2026-01-15 01:00:00
+I was billed for seats of deactivated teammates,billing,2026-01-14 18:00:00,2026-01-15 10:00:00
+Late fee appeared even though payment was on time,billing,2026-01-14 21:00:00,2026-01-15 19:00:00
+Purchase order number is missing from the invoice,billing,2026-01-15 00:00:00,2026-01-16 04:00:00
+Refund went to an old expired card on file,billing,2026-01-15 03:00:00,2026-01-16 15:00:00
+Net-30 terms were ignored and charged immediately,billing,2026-01-15 06:00:00,2026-01-17 06:00:00
+Tax exempt certificate upload keeps getting rejected,billing,2026-01-15 09:00:00,2026-01-17 21:00:00
+Invoice numbering skipped and broke our audit trail,billing,2026-01-15 12:00:00,2026-01-18 12:00:00
+Add-on SKU was billed after we removed the feature,billing,2026-01-15 15:00:00,2026-01-19 15:00:00
+Minimum commit overage was calculated incorrectly,billing,2026-01-15 18:00:00,2026-01-20 18:00:00
+Dunning emails say past due but portal shows paid,billing,2026-01-15 21:00:00,2026-01-16 00:00:00
+I need to split one invoice across two cost centers,billing,2026-01-16 00:00:00,2026-01-16 06:00:00
+Prepaid credits were double-consumed on one invoice,billing,2026-01-16 03:00:00,2026-01-16 13:00:00
+Billing cycle changed from monthly to annual silently,billing,2026-01-16 06:00:00,2026-01-16 22:00:00
+Card verification hold never released after signup,billing,2026-01-16 09:00:00,2026-01-17 07:00:00
+Marketplace fee line item was unexpected on payout,billing,2026-01-16 12:00:00,2026-01-17 16:00:00
+Pro-rated refund math does not match the policy page,billing,2026-01-16 15:00:00,2026-01-18 03:00:00
+I was charged for a region I never enabled,billing,2026-01-16 18:00:00,2026-01-18 18:00:00
+Invoice still lists a cancelled add-on product,billing,2026-01-16 21:00:00,2026-01-19 09:00:00
+Payment failed retry charged me three times overnight,billing,2026-01-17 00:00:00,2026-01-20 00:00:00
+Finance needs a VAT breakdown by country on the bill,billing,2026-01-17 03:00:00,2026-01-21 03:00:00
+Account credit from goodwill never appeared,billing,2026-01-17 06:00:00,2026-01-22 06:00:00
+Delivery arrived two days later than promised,shipping,2026-01-17 09:00:00,2026-01-17 12:00:00
+Package marked delivered but it is still missing,shipping,2026-01-17 12:00:00,2026-01-17 18:00:00
+Wrong item was shipped to my delivery address,shipping,2026-01-17 15:00:00,2026-01-18 01:00:00
+Tracking number never updated after label creation,shipping,2026-01-17 18:00:00,2026-01-18 10:00:00
+Courier left the package outside in the rain,shipping,2026-01-17 21:00:00,2026-01-18 19:00:00
+Address update was not reflected on the shipment,shipping,2026-01-18 00:00:00,2026-01-19 04:00:00
+Express shipping still took five calendar days,shipping,2026-01-18 03:00:00,2026-01-19 15:00:00
+Parcel arrived visibly damaged on arrival,shipping,2026-01-18 06:00:00,2026-01-20 06:00:00
+Label created but the carrier never picked it up,shipping,2026-01-18 09:00:00,2026-01-20 21:00:00
+Wrong warehouse fulfilled and delayed my order,shipping,2026-01-18 12:00:00,2026-01-21 12:00:00
+Customs delay with no status update for a week,shipping,2026-01-18 15:00:00,2026-01-22 15:00:00
+Delivery attempted without ringing the doorbell,shipping,2026-01-18 18:00:00,2026-01-23 18:00:00
+Shipment returned to sender without my request,shipping,2026-01-18 21:00:00,2026-01-19 00:00:00
+Fragile sticker was ignored and the item broke,shipping,2026-01-19 00:00:00,2026-01-19 06:00:00
+Split shipment arrived incomplete missing pieces,shipping,2026-01-19 03:00:00,2026-01-19 13:00:00
+Pickup point was closed when I arrived tonight,shipping,2026-01-19 06:00:00,2026-01-19 22:00:00
+Driver refused to wait for a signature confirmation,shipping,2026-01-19 09:00:00,2026-01-20 07:00:00
+Box was opened and resealed before final delivery,shipping,2026-01-19 12:00:00,2026-01-20 16:00:00
+Shipping estimate jumped right after I paid,shipping,2026-01-19 15:00:00,2026-01-21 03:00:00
+Order stuck in transit for more than two weeks,shipping,2026-01-19 18:00:00,2026-01-21 18:00:00
+Wrong size variant was packed inside the box,shipping,2026-01-19 21:00:00,2026-01-22 09:00:00
+Missing accessories were not included in the package,shipping,2026-01-20 00:00:00,2026-01-23 00:00:00
+Overnight shipping actually delivered next week,shipping,2026-01-20 03:00:00,2026-01-24 03:00:00
+Tracking shows delivered to the wrong city,shipping,2026-01-20 06:00:00,2026-01-25 06:00:00
+Carrier lost the package somewhere mid-route,shipping,2026-01-20 09:00:00,2026-01-20 12:00:00
+My pallet shipment arrived with broken shrink wrap,shipping,2026-01-20 12:00:00,2026-01-20 18:00:00
+Last-mile courier scanned delivered at the depot,shipping,2026-01-20 15:00:00,2026-01-21 01:00:00
+Temperature-controlled shipment arrived warm,shipping,2026-01-20 18:00:00,2026-01-21 10:00:00
+I need a proof of delivery photo for this parcel,shipping,2026-01-20 21:00:00,2026-01-21 19:00:00
+Freight invoice weight does not match the label,shipping,2026-01-21 00:00:00,2026-01-22 04:00:00
+Return label QR code will not scan at the drop-off,shipping,2026-01-21 03:00:00,2026-01-22 15:00:00
+Hazmat package was refused at the shipping counter,shipping,2026-01-21 06:00:00,2026-01-23 06:00:00
+Appointment delivery window was missed by hours,shipping,2026-01-21 09:00:00,2026-01-23 21:00:00
+International airway bill number is invalid,shipping,2026-01-21 12:00:00,2026-01-24 12:00:00
+Carton count on BOL does not match what arrived,shipping,2026-01-21 15:00:00,2026-01-25 15:00:00
+Liftgate service was charged but never provided,shipping,2026-01-21 18:00:00,2026-01-26 18:00:00
+Warehouse short-shipped two units from the order,shipping,2026-01-21 21:00:00,2026-01-22 00:00:00
+Tracking shows out for delivery for three days,shipping,2026-01-22 00:00:00,2026-01-22 06:00:00
+I requested hold at location but it was ignored,shipping,2026-01-22 03:00:00,2026-01-22 13:00:00
+Parcel locker bay was full and returned the box,shipping,2026-01-22 06:00:00,2026-01-22 22:00:00
+Signature required package left without a signature,shipping,2026-01-22 09:00:00,2026-01-23 07:00:00
+Shipping address validation rejected a valid ZIP,shipping,2026-01-22 12:00:00,2026-01-23 16:00:00
+Carrier rerouted my overnight to ground service,shipping,2026-01-22 15:00:00,2026-01-24 03:00:00
+Damaged carton claim needs photos and packing list,shipping,2026-01-22 18:00:00,2026-01-24 18:00:00
+Cross-dock delay added four days with no alert,shipping,2026-01-22 21:00:00,2026-01-25 09:00:00
+I never received the SMS with pickup locker PIN,shipping,2026-01-23 00:00:00,2026-01-26 00:00:00
+Pallet was delivered to the wrong loading dock,shipping,2026-01-23 03:00:00,2026-01-27 03:00:00
+Return RMA shipment is stuck at origin scan,shipping,2026-01-23 06:00:00,2026-01-28 06:00:00
+White-glove delivery team never showed up,shipping,2026-01-23 09:00:00,2026-01-23 12:00:00
+Package dimensions on label caused surcharge dispute,shipping,2026-01-23 12:00:00,2026-01-23 18:00:00
+Same-day courier marked attempt while I was home,shipping,2026-01-23 15:00:00,2026-01-24 01:00:00
+Ocean freight container arrived with wet damage,shipping,2026-01-23 18:00:00,2026-01-24 10:00:00
+I need to change the delivery date before dispatch,shipping,2026-01-23 21:00:00,2026-01-24 19:00:00
+Blind shipment exposed my supplier on the label,shipping,2026-01-24 00:00:00,2026-01-25 04:00:00
+Carrier website tracking conflicts with email updates,shipping,2026-01-24 03:00:00,2026-01-25 15:00:00
+Multi-piece shipment is missing one carton,shipping,2026-01-24 06:00:00,2026-01-26 06:00:00
+Residential surcharge applied to a commercial site,shipping,2026-01-24 09:00:00,2026-01-26 21:00:00
+Delivery photo shows a different building entrance,shipping,2026-01-24 12:00:00,2026-01-27 12:00:00
+My backordered line shipped without the main item,shipping,2026-01-24 15:00:00,2026-01-28 15:00:00
+Customs broker asked for documents we already sent,shipping,2026-01-24 18:00:00,2026-01-29 18:00:00
+Support agent was rude during the phone call,service,2026-01-24 21:00:00,2026-01-25 00:00:00
+Long hold time with no useful resolution,service,2026-01-25 00:00:00,2026-01-25 06:00:00
+Refund request was ignored for an entire week,service,2026-01-25 03:00:00,2026-01-25 13:00:00
+Chat support disconnected on me repeatedly,service,2026-01-25 06:00:00,2026-01-25 22:00:00
+Escalation ticket was closed without any fix,service,2026-01-25 09:00:00,2026-01-26 07:00:00
+Agent promised a callback but never called back,service,2026-01-25 12:00:00,2026-01-26 16:00:00
+Complaint marked resolved but the issue remains,service,2026-01-25 15:00:00,2026-01-27 03:00:00
+No response to my priority support email,service,2026-01-25 18:00:00,2026-01-27 18:00:00
+Ticket reassigned five times with no clear owner,service,2026-01-25 21:00:00,2026-01-28 09:00:00
+Knowledge base article is outdated and wrong,service,2026-01-26 00:00:00,2026-01-29 00:00:00
+Support refused to escalate to engineering,service,2026-01-26 03:00:00,2026-01-30 03:00:00
+Agent asked me to repeat details three times,service,2026-01-26 06:00:00,2026-01-31 06:00:00
+Case closed after an automated reply only,service,2026-01-26 09:00:00,2026-01-26 12:00:00
+Weekend support is unavailable despite my plan,service,2026-01-26 12:00:00,2026-01-26 18:00:00
+Chatbot loops and never opens a human ticket,service,2026-01-26 15:00:00,2026-01-27 01:00:00
+Manager review was promised but never scheduled,service,2026-01-26 18:00:00,2026-01-27 10:00:00
+SLA was breached with no apology or update,service,2026-01-26 21:00:00,2026-01-27 19:00:00
+Agent shared incorrect troubleshooting steps,service,2026-01-27 00:00:00,2026-01-28 04:00:00
+Phone menu has no option for billing help,service,2026-01-27 03:00:00,2026-01-28 15:00:00
+Support language pack is missing for my region,service,2026-01-27 06:00:00,2026-01-29 06:00:00
+Follow-up email bounced from the support alias,service,2026-01-27 09:00:00,2026-01-29 21:00:00
+Priority queue still waited over four hours,service,2026-01-27 12:00:00,2026-01-30 12:00:00
+Agent hung up during active troubleshooting,service,2026-01-27 15:00:00,2026-01-31 15:00:00
+Community forum moderation ignored my report,service,2026-01-27 18:00:00,2026-02-01 18:00:00
+Onboarding specialist missed the scheduled call,service,2026-01-27 21:00:00,2026-01-28 00:00:00
+I need a named account manager for this severity,service,2026-01-28 00:00:00,2026-01-28 06:00:00
+Support transcript was never emailed as promised,service,2026-01-28 03:00:00,2026-01-28 13:00:00
+Customer success ignored my renewal risk email,service,2026-01-28 06:00:00,2026-01-28 22:00:00
+Help desk closed my case as duplicate incorrectly,service,2026-01-28 09:00:00,2026-01-29 07:00:00
+I was told to post publicly instead of private help,service,2026-01-28 12:00:00,2026-01-29 16:00:00
+Tier-2 engineer never joined the bridge call,service,2026-01-28 15:00:00,2026-01-30 03:00:00
+Support rating survey arrived before any fix,service,2026-01-28 18:00:00,2026-01-30 18:00:00
+Agent could not find my account with the CRM ID,service,2026-01-28 21:00:00,2026-01-31 09:00:00
+I asked for a supervisor and was put on mute,service,2026-01-29 00:00:00,2026-02-01 00:00:00
+Ticket status says waiting on customer incorrectly,service,2026-01-29 03:00:00,2026-02-02 03:00:00
+Concierge onboarding checklist was never shared,service,2026-01-29 06:00:00,2026-02-03 06:00:00
+Support hours listed online do not match reality,service,2026-01-29 09:00:00,2026-01-29 12:00:00
+I received three conflicting answers from agents,service,2026-01-29 12:00:00,2026-01-29 18:00:00
+Escalation path is undocumented for enterprise,service,2026-01-29 15:00:00,2026-01-30 01:00:00
+Live agent transferred me and dropped the chat,service,2026-01-29 18:00:00,2026-01-30 10:00:00
+Support asked for screenshots I already attached,service,2026-01-29 21:00:00,2026-01-30 19:00:00
+My accessibility request was dismissed as low priority,service,2026-01-30 00:00:00,2026-01-31 04:00:00
+Quarterly business review was cancelled last minute,service,2026-01-30 03:00:00,2026-01-31 15:00:00
+Agent read from a script and ignored my question,service,2026-01-30 06:00:00,2026-02-01 06:00:00
+I need a written RCA and only got a verbal apology,service,2026-01-30 09:00:00,2026-02-01 21:00:00
+Support portal search returns irrelevant articles,service,2026-01-30 12:00:00,2026-02-02 12:00:00
+Customer care promised a goodwill credit then denied it,service,2026-01-30 15:00:00,2026-02-03 15:00:00
+My complaint was marked spam by the intake bot,service,2026-01-30 18:00:00,2026-02-04 18:00:00
+Regional support cannot handle my local language,service,2026-01-30 21:00:00,2026-01-31 00:00:00
+I was told to wait 10 business days with no update,service,2026-01-31 00:00:00,2026-01-31 06:00:00
+Agent closed the ticket while I was still typing,service,2026-01-31 03:00:00,2026-01-31 13:00:00
+Enterprise hotline routes to the general queue,service,2026-01-31 06:00:00,2026-01-31 22:00:00
+Support refused screen share for a complex issue,service,2026-01-31 09:00:00,2026-02-01 07:00:00
+I need after-hours emergency support for outage,service,2026-01-31 12:00:00,2026-02-01 16:00:00
+Case notes are empty so every agent starts over,service,2026-01-31 15:00:00,2026-02-02 03:00:00
+Support promised a patch date and then went silent,service,2026-01-31 18:00:00,2026-02-02 18:00:00
+My NPS follow-up call never happened,service,2026-01-31 21:00:00,2026-02-03 09:00:00
+Help desk will not reopen a wrongly closed case,service,2026-02-01 00:00:00,2026-02-04 00:00:00
+I asked for multilingual support and got English only,service,2026-02-01 03:00:00,2026-02-05 03:00:00
+Agent blamed me for a known product defect,service,2026-02-01 06:00:00,2026-02-06 06:00:00

@@ -48,7 +48,9 @@ streamlit run frontend/app.py
 
 - API docs: http://127.0.0.1:8000/docs  
 - Dashboard: http://127.0.0.1:8501  
-- Sample upload file: `data/sample_upload.csv` (held-out texts)
+- Sample upload file: `data/sample_upload.csv` (**48 held-out texts** — use this in the UI)
+- Training labels live in `data/complaints.csv` (**240 rows**, 60×4) — for `python -m ml.train` only, not for demo upload
+- If the dashboard shows junk / 100% review from old runs: stop API → `python scripts/reset_local_db.py` → restart → upload `sample_upload.csv`
 
 ### Sample workflow
 
@@ -111,7 +113,7 @@ Important flags:
 | `AUTH_ENABLED` | Require `X-API-Key` on `/api/v1/*` |
 | `API_KEY` | Required when auth is enabled (fail-fast if missing) |
 | `REQUIRE_AUTH_IN_PRODUCTION` | Defaults **true** — `ENVIRONMENT=production\|staging` must enable auth (opt out only for demos) |
-| `CONFIDENCE_THRESHOLD` | Below this → `needs_review` (default `0.6`) |
+| `CONFIDENCE_THRESHOLD` | Below this → `needs_review` (default `0.38`; 4-class max-prob rarely exceeds ~0.55) |
 
 See `.env.example` for `DATABASE_URL`, upload limits, CORS, page sizes, and frontend `API_BASE_URL`.
 
@@ -172,9 +174,11 @@ via `python -m ml.train`).
 - Holdout metrics for the winner are in `ml/artifacts/evaluation.json`.
 - Selection rule: highest **macro F1**, then weighted F1, then accuracy.
 - We only claim improvement when those measured metrics beat the baseline.
-- Predictions below `CONFIDENCE_THRESHOLD` (default `0.6`) set `needs_review=true`
+- Predictions below `CONFIDENCE_THRESHOLD` (default `0.38`) set `needs_review=true`
   while keeping the model’s predicted `category` (so charts stay meaningful).
 - Reviewers can clear the queue with `POST /api/v1/complaints/{id}/review`.
+- 4-class logistic regression max-probabilities are often soft (~0.3–0.5); that is expected,
+  not a broken upload. Prefer `data/sample_upload.csv` for demos.
 - API responses expose `model_version` and optional alternative class scores. Model confidence is the max class probability and may be poorly calibrated.
 
 ---

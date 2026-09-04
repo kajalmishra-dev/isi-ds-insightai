@@ -6,7 +6,7 @@ services:
     environment:
       # Demo-friendly defaults. For shared/staging set AUTH_ENABLED=true + API_KEY.
       DATABASE_URL: sqlite:////data/insight.db
-      CONFIDENCE_THRESHOLD: "0.6"
+      CONFIDENCE_THRESHOLD: "0.38"
       ENVIRONMENT: development
       AUTH_ENABLED: "false"
       REQUIRE_AUTH_IN_PRODUCTION: "false"

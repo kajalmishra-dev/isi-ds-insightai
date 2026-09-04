@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import html
 import json
 import os
 import time
@@ -615,6 +616,26 @@ def inject_styles() -> None:
             font-size: 0.88rem !important;
         }
 
+        /* Selected review-queue row (glide selection + styler fallback) */
+        div[data-testid="stDataFrame"] [aria-selected="true"],
+        div[data-testid="stDataFrame"] [role="gridcell"][aria-selected="true"] {
+            background-color: #ebf5ff !important;
+        }
+
+        .triage-complaint {
+            color: var(--ink) !important;
+            font-size: 0.98rem;
+            line-height: 1.45;
+            margin: 0 0 0.75rem;
+        }
+
+        .triage-meta {
+            color: var(--muted) !important;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            margin: 0 0 1rem;
+        }
+
         [data-testid="stMetricValue"] {
             font-weight: 600 !important;
             letter-spacing: -0.03em !important;
@@ -813,8 +834,8 @@ def empty_state(title: str, body: str) -> None:
     )
 
 
-def style_review_frame(df: pd.DataFrame) -> pd.DataFrame:
-    """Human-readable review table (neutral rows; confidence as 0–100 for ProgressColumn)."""
+def style_review_frame(df: pd.DataFrame, selected_id: int | None = None):
+    """Human-readable review table; highlights the active triage row."""
     view = df.copy()
     if "confidence" in view.columns:
         view["confidence"] = (pd.to_numeric(view["confidence"], errors="coerce") * 100).round(1)
@@ -825,7 +846,24 @@ def style_review_frame(df: pd.DataFrame) -> pd.DataFrame:
     if "job_id" in view.columns:
         view["job_id"] = view["job_id"].map(format_job_id)
     cols = [c for c in ["text", "category", "confidence", "created_at", "job_id"] if c in view.columns]
-    return view[cols]
+    view = view[cols].reset_index(drop=True)
+
+    if selected_id is None or "id" not in df.columns:
+        return view
+
+    # Positional index of the selected complaint in the current queue order
+    id_list = [int(x) for x in df["id"].tolist()]
+    try:
+        selected_pos = id_list.index(int(selected_id))
+    except ValueError:
+        return view
+
+    def _highlight(row: pd.Series) -> list[str]:
+        if int(row.name) == selected_pos:
+            return ["background-color: #EBF5FF"] * len(row)
+        return [""] * len(row)
+
+    return view.style.apply(_highlight, axis=1)
 
 
 def _alert_tag_for(code: str) -> tuple[str, str]:
@@ -947,7 +985,7 @@ def render_overview(data: dict[str, Any]) -> None:
 
     render_system_alerts(data.get("insights") or [])
 
-    left, right = st.columns([1.25, 1], gap="large")
+    left, right = st.columns([1.5, 1], gap="large")
     with left:
         st.markdown(
             '<div class="panel"><div class="panel-title">Category distribution</div>',
@@ -960,24 +998,43 @@ def render_overview(data: dict[str, Any]) -> None:
         if cat_df.empty:
             empty_state("No categories", "Upload and process a CSV to see distribution.")
         else:
+            total = int(data.get("total_complaints") or 0)
+            counts_by_label = {
+                label_category(item["category"]): int(item["count"])
+                for item in (data.get("top_issues") or [])
+            }
+            # Fill any categories missing from top_issues via percentage × total
+            raw_dist = data.get("category_distribution") or {}
+            for raw, pct in raw_dist.items():
+                label = label_category(raw)
+                if label not in counts_by_label and total:
+                    counts_by_label[label] = int(round(float(pct) * total / 100.0))
+
             cat_df["Category"] = cat_df["Category"].map(label_category)
+            cat_df["Count"] = cat_df["Category"].map(
+                lambda label: counts_by_label.get(label, 0)
+            )
+            cat_df["Axis"] = [
+                f"{label} ({count}) — {pct:.1f}%"
+                for label, count, pct in zip(
+                    cat_df["Category"], cat_df["Count"], cat_df["Percentage"]
+                )
+            ]
+            cat_df = cat_df.sort_values("Percentage", ascending=True)
             fig = px.bar(
                 cat_df,
                 x="Percentage",
-                y="Category",
+                y="Axis",
                 orientation="h",
-                text="Percentage",
                 color_discrete_sequence=["#0071e3"],
             )
             fig.update_traces(
-                texttemplate="%{text:.1f}%",
                 textposition="outside",
-                textfont_color="#1d1d1f",
                 marker_line_width=0,
                 width=0.55,
             )
             fig.update_layout(
-                margin=dict(l=10, r=40, t=10, b=10),
+                margin=dict(l=10, r=24, t=10, b=10),
                 xaxis_title="",
                 yaxis_title="",
                 showlegend=False,
@@ -991,32 +1048,18 @@ def render_overview(data: dict[str, Any]) -> None:
                 xaxis=dict(
                     gridcolor="#f0f0f2",
                     zeroline=False,
-                    range=[0, max(100, float(cat_df["Percentage"].max()) * 1.15)],
+                    range=[0, max(100, float(cat_df["Percentage"].max()) * 1.12)],
+                    ticksuffix="%",
                 ),
                 yaxis=dict(gridcolor="#ffffff"),
-                height=max(260, 56 * len(cat_df) + 80),
+                height=max(280, 64 * len(cat_df) + 80),
             )
             st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
         st.markdown("</div>", unsafe_allow_html=True)
 
     with right:
         st.markdown(
-            '<div class="panel"><div class="panel-title">Top issues</div>',
-            unsafe_allow_html=True,
-        )
-        if not data.get("top_issues"):
-            empty_state("No ranked issues", "Insights appear after complaints are classified.")
-        else:
-            rows = "".join(
-                f'<div class="rank-item"><span>{label_category(item["category"])}</span>'
-                f'<span class="count">{item["count"]}</span></div>'
-                for item in data["top_issues"]
-            )
-            st.markdown(rows, unsafe_allow_html=True)
-        st.markdown("</div>", unsafe_allow_html=True)
-
-        st.markdown(
-            '<div class="panel"><div class="panel-title">Recent jobs</div>',
+            '<div class="panel"><div class="panel-title">Recent Ingestion Jobs</div>',
             unsafe_allow_html=True,
         )
         jobs = st.session_state.jobs_data or []
@@ -1038,38 +1081,41 @@ def render_overview(data: dict[str, Any]) -> None:
             st.dataframe(show, use_container_width=True, hide_index=True)
 
             job_ids = [str(j.get("id")) for j in jobs if j.get("id")]
-            selected_job = st.selectbox(
-                "Job actions",
-                options=job_ids,
-                format_func=lambda jid: next(
-                    (
-                        f"{str(j.get('id', ''))[:8]} · {j.get('status')} · {j.get('filename')}"
-                        for j in jobs
-                        if str(j.get("id")) == jid
+            if len(job_ids) == 1:
+                selected_job = job_ids[0]
+            else:
+                selected_job = st.selectbox(
+                    "Export job",
+                    options=job_ids,
+                    format_func=lambda jid: next(
+                        (
+                            f"{str(j.get('id', ''))[:8]} · {j.get('status')} · {j.get('filename')}"
+                            for j in jobs
+                            if str(j.get("id")) == jid
+                        ),
+                        jid,
                     ),
-                    jid,
-                ),
-            )
+                )
             selected_meta = next(j for j in jobs if str(j.get("id")) == selected_job)
-            a1, a2 = st.columns(2)
-            with a1:
+            actions = st.columns(2 if (
+                selected_meta.get("can_retry") or selected_meta.get("status") == "failed"
+            ) else 1)
+            with actions[0]:
                 try:
                     export_res = api_get(f"/jobs/{selected_job}/export.csv")
                     if export_res.status_code == 200:
                         st.download_button(
-                            "Export job CSV",
+                            "Export CSV",
                             data=export_res.content,
                             file_name=f"insightai_job_{selected_job[:8]}.csv",
                             mime="text/csv",
                             use_container_width=True,
                         )
-                    else:
-                        st.caption("Export unavailable for this job.")
                 except requests.RequestException:
-                    st.caption("Export request failed.")
-            with a2:
-                if selected_meta.get("can_retry") or selected_meta.get("status") == "failed":
-                    if st.button("Retry failed job", use_container_width=True):
+                    st.caption("Export unavailable")
+            if selected_meta.get("can_retry") or selected_meta.get("status") == "failed":
+                with actions[1]:
+                    if st.button("Retry", use_container_width=True):
                         try:
                             retry_res = api_post(f"/jobs/{selected_job}/retry")
                         except requests.RequestException as exc:
@@ -1107,55 +1153,101 @@ def render_review_queue(data: dict[str, Any]) -> None:
     if st.session_state.review_selected_id not in ids:
         st.session_state.review_selected_id = ids[0]
 
+    table_key = "review_queue_table"
+    table_state = st.session_state.get(table_key)
+    current_rows: list[int] = []
+    if isinstance(table_state, dict):
+        current_rows = [
+            int(r)
+            for r in ((table_state.get("selection") or {}).get("rows") or [])
+            if isinstance(r, (int, float)) or (isinstance(r, str) and str(r).isdigit())
+        ]
+    # Prefer the dataframe's checkbox selection when present
+    if current_rows and 0 <= current_rows[0] < len(ids):
+        st.session_state.review_selected_id = ids[current_rows[0]]
+    elif st.session_state.review_selected_id not in ids:
+        st.session_state.review_selected_id = ids[0]
+
+    selected_pos = ids.index(int(st.session_state.review_selected_id))
+    # Seed checkbox only when nothing is selected yet (don't fight user clicks)
+    if not current_rows:
+        st.session_state[table_key] = {
+            "selection": {"rows": [selected_pos], "columns": []}
+        }
+
     left, right = st.columns([1.4, 1], gap="large")
     with left:
-        st.caption(f"{len(review_df)} shown · lowest confidence first · click a row")
-        display = style_review_frame(review_df)
+        st.markdown(
+            '<div class="panel"><div class="panel-title">Review queue</div>'
+            f'<div class="triage-meta">{len(review_df)} shown · lowest confidence first</div>',
+            unsafe_allow_html=True,
+        )
+        display = style_review_frame(review_df, selected_id=st.session_state.review_selected_id)
         event = st.dataframe(
             display,
             use_container_width=True,
             hide_index=True,
             on_select="rerun",
             selection_mode="single-row",
-            key="review_queue_table",
+            key=table_key,
             column_config={
+                "text": st.column_config.TextColumn("Complaint", width="large"),
+                "category": st.column_config.TextColumn("Category", width="medium"),
                 "confidence": st.column_config.ProgressColumn(
                     "Confidence",
                     help="Model confidence (max-probability)",
                     format="%.1f%%",
                     min_value=0,
                     max_value=100,
+                    width="small",
                 ),
-                "text": st.column_config.TextColumn("Complaint", width="large"),
+                "created_at": st.column_config.TextColumn("Created", width="small"),
+                "job_id": st.column_config.TextColumn("Job", width="small"),
             },
         )
         selected_rows = []
         if event is not None and getattr(event, "selection", None) is not None:
             selected_rows = list(event.selection.rows or [])
-        if selected_rows:
-            st.session_state.review_selected_id = int(review_df.iloc[selected_rows[0]]["id"])
+        if selected_rows and 0 <= selected_rows[0] < len(ids):
+            st.session_state.review_selected_id = ids[selected_rows[0]]
+        st.markdown("</div>", unsafe_allow_html=True)
 
     row = review_df.loc[review_df["id"] == st.session_state.review_selected_id].iloc[0]
     with right:
-        st.markdown("**Triage**")
-        st.write(row.get("text", ""))
+        st.markdown(
+            '<div class="panel"><div class="panel-title">Triage</div>',
+            unsafe_allow_html=True,
+        )
+        st.markdown(
+            f'<p class="triage-complaint">{html.escape(str(row.get("text", "")))}</p>',
+            unsafe_allow_html=True,
+        )
         conf_pct = float(row.get("confidence") or 0) * 100
         conf_label = "Low" if conf_pct < 30 else ("Medium" if conf_pct < 50 else "OK")
-        st.caption(
-            f"Suggested: **{label_category(row.get('category'))}** · "
+        st.markdown(
+            f'<p class="triage-meta">Suggested: <strong>{label_category(row.get("category"))}</strong> · '
             f"{format_confidence(row.get('confidence'))} ({conf_label}) · "
-            f"Job {format_job_id(row.get('job_id'))}"
+            f"Job {format_job_id(row.get('job_id'))}</p>",
+            unsafe_allow_html=True,
         )
         options = list(TRIAGE_CATEGORIES)
-        current = str(row.get("category") or "billing")
+        current = str(row.get("category") or "billing").strip().lower()
         if current not in options:
             options = [current] + options
+
+        # Reset dropdown to the model's suggested category whenever the row changes
+        cat_key = f"triage_cat_{int(row['id'])}"
+        if st.session_state.get("triage_bound_id") != int(row["id"]):
+            st.session_state[cat_key] = current
+            st.session_state.triage_bound_id = int(row["id"])
+        elif cat_key not in st.session_state:
+            st.session_state[cat_key] = current
+
         chosen = st.selectbox(
             "Assign category",
             options=options,
-            index=options.index(current),
             format_func=label_category,
-            key=f"triage_cat_{int(row['id'])}",
+            key=cat_key,
         )
         if st.button("Approve / Submit", type="primary", use_container_width=True):
             try:
@@ -1168,10 +1260,12 @@ def render_review_queue(data: dict[str, Any]) -> None:
             else:
                 if res.status_code == 200:
                     st.success("Cleared from review queue")
+                    st.session_state.pop("triage_bound_id", None)
                     load_dashboard_data()
                     st.rerun()
                 else:
                     st.error(friendly_http_error("Review failed", res))
+        st.markdown("</div>", unsafe_allow_html=True)
 
 
 def render_explorer(data: dict[str, Any]) -> None:

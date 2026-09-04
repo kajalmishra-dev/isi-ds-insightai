@@ -164,11 +164,12 @@ def _build_insights(summary: AnalyticsSummary) -> list[InsightItem]:
         )
         if ranked and ranked[0][1] < 0.5:
             weakest, conf = ranked[0]
+            weakest_label = str(weakest).replace("_", " ").title()
             insights.append(
                 InsightItem(
                     code="weakest_confidence",
                     text=(
-                        f"{weakest} has very low average model confidence "
+                        f"{weakest_label} has very low average model confidence "
                         f"({conf * 100:.1f}%) — check training coverage for this class."
                     ),
                 )
@@ -264,7 +265,7 @@ def get_summary(db: Session) -> AnalyticsSummary:
 
         top_issues = [
             TopIssue(category=cat or "unknown", count=count)
-            for cat, count in sorted(category_rows, key=lambda item: item[1], reverse=True)[:3]
+            for cat, count in sorted(category_rows, key=lambda item: item[1], reverse=True)
         ]
 
         summary = AnalyticsSummary(

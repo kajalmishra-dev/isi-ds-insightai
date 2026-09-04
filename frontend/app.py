@@ -477,11 +477,99 @@ def inject_styles() -> None:
         }
 
         section[data-testid="stSidebar"] .sidebar-brand {
-            font-size: 1.15rem;
+            font-size: 1.2rem;
             font-weight: 700;
             letter-spacing: -0.03em;
-            margin: 0 0 0.15rem;
+            margin: 0;
             color: var(--ink) !important;
+            line-height: 1.2;
+        }
+
+        section[data-testid="stSidebar"] .sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+            margin-bottom: 0.35rem;
+        }
+
+        section[data-testid="stSidebar"] .status-dot {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--muted) !important;
+            white-space: nowrap;
+        }
+
+        section[data-testid="stSidebar"] .status-dot i {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            background: #34c759;
+        }
+
+        section[data-testid="stSidebar"] .status-dot.down i {
+            background: #ff3b30;
+        }
+
+        section[data-testid="stSidebar"] .sidebar-divider {
+            height: 1px;
+            background: var(--line);
+            margin: 1rem 0;
+        }
+
+        section[data-testid="stSidebar"] .sidebar-footer {
+            margin-top: 1.25rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--line);
+            font-size: 0.72rem;
+            color: var(--faint) !important;
+            letter-spacing: -0.01em;
+        }
+
+        /* Nav: radio → vertical pill tabs */
+        section[data-testid="stSidebar"] div[data-testid="stRadio"] > div {
+            flex-direction: column;
+            gap: 0.2rem;
+            border: none !important;
+        }
+
+        section[data-testid="stSidebar"] div[data-testid="stRadio"] label {
+            background: transparent !important;
+            border: 1px solid transparent !important;
+            border-radius: 10px !important;
+            padding: 0.55rem 0.7rem !important;
+            margin: 0 !important;
+            transition: background 0.12s ease, border-color 0.12s ease;
+        }
+
+        section[data-testid="stSidebar"] div[data-testid="stRadio"] label:hover {
+            background: #f0f0f2 !important;
+        }
+
+        section[data-testid="stSidebar"] div[data-testid="stRadio"] label:has(input:checked) {
+            background: #ffffff !important;
+            border-color: var(--line) !important;
+            box-shadow: var(--shadow);
+            font-weight: 600 !important;
+        }
+
+        section[data-testid="stSidebar"] div[data-testid="stRadio"] label > div:first-child {
+            display: none !important;
+        }
+
+        section[data-testid="stSidebar"] .stButton > button[kind="secondary"],
+        section[data-testid="stSidebar"] button[data-testid="baseButton-secondary"] {
+            background: transparent !important;
+            border: 1px solid var(--line) !important;
+            color: var(--muted) !important;
+            font-weight: 500 !important;
+            padding: 0.25rem 0.55rem !important;
+            min-height: 0 !important;
+            font-size: 0.78rem !important;
         }
 
         .block-container .stButton > button {
@@ -1328,56 +1416,28 @@ else:
         st.session_state.model_version = model_version
 
 with st.sidebar:
-    st.markdown('<p class="sidebar-brand">InsightAI</p>', unsafe_allow_html=True)
-    st.caption("Complaint intelligence")
+    status_cls = "" if ok else " down"
+    status_label = "Online" if ok else "Offline"
+    brand_col, refresh_col = st.columns([4, 1])
+    with brand_col:
+        st.markdown(
+            f"""
+            <div class="sidebar-header">
+                <p class="sidebar-brand">InsightAI</p>
+                <span class="status-dot{status_cls}"><i></i>{status_label}</span>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        st.caption("Complaint intelligence")
+    with refresh_col:
+        if st.button("↻", help="Refresh dashboard data", key="sidebar_refresh"):
+            with st.spinner("Refreshing…"):
+                load_dashboard_data()
+            st.rerun()
 
-    st.markdown('<div class="section-label">System</div>', unsafe_allow_html=True)
-    st.caption(f"API `{BASE_URL}`")
-    if ok:
-        st.markdown('<span class="status-pill ok">API ready</span>', unsafe_allow_html=True)
-        if st.session_state.model_version:
-            st.caption(f"Model `{st.session_state.model_version}`")
-    else:
-        st.markdown('<span class="status-pill bad">API down</span>', unsafe_allow_html=True)
-        st.caption(detail)
-
-    st.markdown('<div class="section-label">Authentication</div>', unsafe_allow_html=True)
-    st.session_state.api_key = st.text_input(
-        "API key",
-        value=st.session_state.api_key,
-        type="password",
-        help="Required only when AUTH_ENABLED=true.",
-        label_visibility="collapsed",
-        placeholder="API key (optional)",
-    )
-
-    st.markdown('<div class="section-label">Data</div>', unsafe_allow_html=True)
-    uploaded_file = st.file_uploader("Upload dataset", type=["csv"])
-    if uploaded_file is not None and st.button("Start ingestion", use_container_width=True):
-        with st.spinner("Uploading dataset…"):
-            try:
-                res = api_post(
-                    "/upload",
-                    files={"file": (uploaded_file.name, uploaded_file.getvalue(), "text/csv")},
-                )
-            except requests.RequestException as exc:
-                st.error(f"Upload failed: {exc}")
-            else:
-                if res.status_code in (200, 202):
-                    payload = res.json()
-                    st.session_state.active_job_id = payload.get("job_id")
-                    if payload.get("deduplicated"):
-                        st.info("Identical file already processed — opened existing job.")
-                    else:
-                        st.success("Upload accepted")
-                else:
-                    st.error(friendly_http_error("Upload failed", res))
-
-    render_job_panel()
-
-    st.markdown('<div class="section-label">Analysis</div>', unsafe_allow_html=True)
     st.session_state.section = st.radio(
-        "Section",
+        "Navigation",
         options=SECTIONS,
         index=SECTIONS.index(st.session_state.section)
         if st.session_state.section in SECTIONS
@@ -1385,11 +1445,60 @@ with st.sidebar:
         label_visibility="collapsed",
     )
 
-    st.markdown('<div class="section-label">Configuration</div>', unsafe_allow_html=True)
-    if st.button("Refresh dashboard", use_container_width=True):
-        with st.spinner("Refreshing…"):
-            load_dashboard_data()
-        st.rerun()
+    st.markdown('<div class="sidebar-divider"></div>', unsafe_allow_html=True)
+
+    st.markdown('<div class="section-label">Data</div>', unsafe_allow_html=True)
+    uploaded_file = st.file_uploader(
+        "Upload CSV",
+        type=["csv"],
+        label_visibility="collapsed",
+        help="Upload a complaint CSV to classify.",
+    )
+    if uploaded_file is not None:
+        if st.button("Ingest data", type="primary", use_container_width=True):
+            with st.spinner("Uploading and starting classification…"):
+                try:
+                    res = api_post(
+                        "/upload",
+                        files={
+                            "file": (
+                                uploaded_file.name,
+                                uploaded_file.getvalue(),
+                                "text/csv",
+                            )
+                        },
+                    )
+                except requests.RequestException as exc:
+                    st.error(f"Upload failed: {exc}")
+                else:
+                    if res.status_code in (200, 202):
+                        payload = res.json()
+                        st.session_state.active_job_id = payload.get("job_id")
+                        if payload.get("deduplicated"):
+                            st.info("Identical file already processed — opened existing job.")
+                        else:
+                            st.success("Ingestion started")
+                        st.rerun()
+                    else:
+                        st.error(friendly_http_error("Upload failed", res))
+
+    render_job_panel()
+
+    with st.expander("Settings", expanded=False):
+        st.session_state.api_key = st.text_input(
+            "API key",
+            value=st.session_state.api_key,
+            type="password",
+            help="Only needed when AUTH_ENABLED=true on the API.",
+            placeholder="Optional",
+        )
+
+    version = os.getenv("APP_VERSION", "2.1.0")
+    model_tag = st.session_state.model_version or "model pending"
+    st.markdown(
+        f'<div class="sidebar-footer">v{version} · {model_tag}</div>',
+        unsafe_allow_html=True,
+    )
 
 if not st.session_state.bootstrapped and ok and not polling:
     with st.spinner("Loading dashboard…"):
@@ -1402,7 +1511,7 @@ if st.session_state.last_error:
 if not ok and st.session_state.analytics_data is None:
     empty_state(
         "Backend unavailable",
-        "Start the API (`uvicorn backend.main:app --reload`) then click Refresh dashboard.",
+        "Start the API (`uvicorn backend.main:app --reload`), then tap ↻ in the sidebar.",
     )
     st.stop()
 
@@ -1410,7 +1519,7 @@ data = st.session_state.analytics_data
 if data is None:
     empty_state(
         "No analytics loaded",
-        "Upload `data/sample_upload.csv` from the sidebar, or click Refresh dashboard.",
+        "Upload `data/sample_upload.csv` from the sidebar, or tap ↻ to reload.",
     )
     st.stop()
 

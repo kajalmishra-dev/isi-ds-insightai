@@ -1,0 +1,25 @@
+text,created_at,resolved_at
+The mobile client dies whenever I open Settings,2026-03-01 10:00:00,2026-03-01 12:00:00
+Password reset link says it is already expired,2026-03-01 15:00:00,2026-03-01 20:00:00
+Admin console throws a 502 after I save changes,2026-03-01 20:00:00,2026-03-02 08:00:00
+Face ID unlock fails after the latest release,2026-03-02 01:00:00,2026-03-02 21:00:00
+Webhook signatures keep validating as invalid,2026-03-02 06:00:00,2026-03-03 12:00:00
+CSV import stalls at ninety percent forever,2026-03-02 11:00:00,2026-03-04 11:00:00
+I was billed twice for January already,2026-03-02 16:00:00,2026-03-05 16:00:00
+My statement shows a fee I never approved,2026-03-02 21:00:00,2026-03-07 21:00:00
+Coupon worked yesterday but fails today,2026-03-03 02:00:00,2026-03-03 04:00:00
+Sales tax line looks wrong for my state,2026-03-03 07:00:00,2026-03-03 12:00:00
+Cancellation still shows active and charging,2026-03-03 12:00:00,2026-03-04 00:00:00
+Wire transfer refund has not landed yet,2026-03-03 17:00:00,2026-03-04 13:00:00
+My parcel shows delivered to a neighbor I do not know,2026-03-03 22:00:00,2026-03-05 04:00:00
+Tracking froze after leaving the depot,2026-03-04 03:00:00,2026-03-06 03:00:00
+Box arrived crushed and wet inside,2026-03-04 08:00:00,2026-03-07 08:00:00
+I ordered blue but received green,2026-03-04 13:00:00,2026-03-09 13:00:00
+Priority overnight took four business days,2026-03-04 18:00:00,2026-03-04 20:00:00
+Pickup locker code never arrived by SMS,2026-03-04 23:00:00,2026-03-05 04:00:00
+The agent dismissed my issue without reading it,2026-03-05 04:00:00,2026-03-05 16:00:00
+I waited on hold for almost two hours,2026-03-05 09:00:00,2026-03-06 05:00:00
+My VIP ticket got closed with a canned reply,2026-03-05 14:00:00,2026-03-06 20:00:00
+Nobody called back after promising a manager review,2026-03-05 19:00:00,2026-03-07 19:00:00
+Live chat ended while I was typing the details,2026-03-06 00:00:00,2026-03-09 00:00:00
+Support said it was fixed but nothing changed,2026-03-06 05:00:00,2026-03-11 05:00:00

@@ -15,12 +15,23 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+          cache: pip
 
       - name: Install dependencies
         run: pip install -r requirements-dev.txt
 
-      - name: Train model
-        run: python -m ml.train
+      - name: Generate data and train model
+        run: |
+          python scripts/generate_training_data.py
+          python -m ml.train
+
+      - name: Verify ML artifacts
+        run: |
+          test -f ml/artifacts/model.joblib
+          test -f ml/artifacts/metadata.json
+          test -f ml/artifacts/evaluation.json
+          test -f ml/artifacts/experiments.json
+          python -c "import json; m=json.load(open('ml/artifacts/metadata.json')); assert m.get('model_version')"
 
       - name: Run tests
         run: pytest tests/ -v

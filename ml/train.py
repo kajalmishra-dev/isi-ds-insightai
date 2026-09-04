@@ -1,73 +1,124 @@
+"""Train the selected InsightAI classifier and write eval artifacts."""
+
+from __future__ import annotations
+
 import json
 import logging
 import os
+from datetime import datetime, timezone
 
 import joblib
-import pandas as pd
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import classification_report
-from sklearn.model_selection import train_test_split
-from sklearn.pipeline import Pipeline
+from sklearn.metrics import classification_report, confusion_matrix
+
+from ml.experiments import EXPERIMENT_PATH, evaluate_candidates
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-DATA_PATH = os.path.join("data", "complaints.csv")
 MODEL_DIR = os.path.join("ml", "artifacts")
 MODEL_PATH = os.path.join(MODEL_DIR, "model.joblib")
 METADATA_PATH = os.path.join(MODEL_DIR, "metadata.json")
+EVAL_PATH = os.path.join(MODEL_DIR, "evaluation.json")
 
 os.makedirs(MODEL_DIR, exist_ok=True)
 
 
-def load_data():
-    logger.info("Loading dataset from %s", DATA_PATH)
-    df = pd.read_csv(DATA_PATH)
-
-    required_cols = {"text", "category"}
-    if not required_cols.issubset(df.columns):
-        raise ValueError("Dataset must contain 'text' and 'category' columns")
-
-    df = df.dropna(subset=["text", "category"])
-    df["text"] = df["text"].astype(str)
-    return df["text"], df["category"]
-
-
-def build_pipeline():
-    return Pipeline(
-        [
-            ("tfidf", TfidfVectorizer(ngram_range=(1, 2))),
-            ("clf", LogisticRegression(class_weight="balanced", max_iter=300)),
-        ]
-    )
-
-
 def train():
-    features, labels = load_data()
-    x_train, x_test, y_train, y_test = train_test_split(
-        features, labels, test_size=0.2, random_state=42
-    )
-
-    model = build_pipeline()
-    logger.info("Training model...")
-    model.fit(x_train, y_train)
+    experiment = evaluate_candidates()
+    model = experiment["winner_pipeline"]
+    model_version = experiment["winner_name"]
+    x_test = experiment["x_test"]
+    y_test = experiment["y_test"]
+    x_train = experiment["x_train"]
+    features = experiment["features"]
+    labels = experiment["labels"]
 
     predictions = model.predict(x_test)
-    report = classification_report(y_test, predictions, output_dict=True)
-    logger.info("\n%s", classification_report(y_test, predictions))
+    report = classification_report(
+        y_test, predictions, output_dict=True, zero_division=0
+    )
+    logger.info("\n%s", classification_report(y_test, predictions, zero_division=0))
+
+    labels_sorted = sorted(labels.unique().tolist())
+    cm = confusion_matrix(y_test, predictions, labels=labels_sorted)
+    class_counts = labels.value_counts().to_dict()
+
+    # Ensure probabilities exist for product confidence UX
+    if not hasattr(model, "predict_proba"):
+        raise RuntimeError(
+            f"Selected model {model_version} does not support predict_proba"
+        )
 
     joblib.dump(model, MODEL_PATH)
-    metadata = {
-        "model_path": MODEL_PATH,
-        "classes": sorted(labels.unique().tolist()),
-        "train_rows": int(len(features)),
+
+    evaluation = {
+        "model_version": model_version,
+        "evaluated_at": datetime.now(timezone.utc).isoformat(),
+        "holdout_rows": int(len(x_test)),
+        "train_rows": int(len(x_train)),
+        "accuracy": report["accuracy"],
+        "macro_precision": report["macro avg"]["precision"],
+        "macro_recall": report["macro avg"]["recall"],
         "macro_f1": report["macro avg"]["f1-score"],
+        "weighted_f1": report["weighted avg"]["f1-score"],
+        "per_class": {
+            label: {
+                "precision": report[label]["precision"],
+                "recall": report[label]["recall"],
+                "f1": report[label]["f1-score"],
+                "support": report[label]["support"],
+            }
+            for label in labels_sorted
+            if label in report
+        },
+        "confusion_matrix": {
+            "labels": labels_sorted,
+            "matrix": cm.astype(int).tolist(),
+        },
+        "experiment_path": EXPERIMENT_PATH,
+        "improved_over_baseline": experiment["report"]["improved_over_baseline"],
+        "caveats": [
+            "Metrics are from a stratified holdout of a small synthetic dataset.",
+            "Macro F1 on ~20 test rows is informative for demos, not production quality.",
+            "Model confidence is the max class probability and may be poorly calibrated.",
+            "Model chosen by ml/experiments.py using macro F1 (then weighted F1, accuracy).",
+        ],
+    }
+    with open(EVAL_PATH, "w", encoding="utf-8") as handle:
+        json.dump(evaluation, handle, indent=2)
+
+    metadata = {
+        "model_version": model_version,
+        "model_path": MODEL_PATH,
+        "evaluation_path": EVAL_PATH,
+        "experiment_path": EXPERIMENT_PATH,
+        "classes": labels_sorted,
+        "class_counts": {k: int(v) for k, v in class_counts.items()},
+        "dataset_rows": int(len(features)),
+        "train_rows": int(len(x_train)),
+        "holdout_rows": int(len(x_test)),
+        "macro_f1": report["macro avg"]["f1-score"],
+        "accuracy": report["accuracy"],
+        "improved_over_baseline": experiment["report"]["improved_over_baseline"],
+        "candidates_evaluated": [row["model"] for row in experiment["report"]["results"]],
+        "dataset_notes": (
+            "Synthetic hand-authored complaints from scripts/generate_training_data.py. "
+            "sample_upload.csv is a held-out text set with zero overlap."
+        ),
+        "trained_at": datetime.now(timezone.utc).isoformat(),
     }
     with open(METADATA_PATH, "w", encoding="utf-8") as handle:
         json.dump(metadata, handle, indent=2)
 
-    logger.info("Model saved to %s", MODEL_PATH)
+    logger.info(
+        "Saved %s -> %s (macro_f1=%.3f, accuracy=%.3f, improved=%s)",
+        model_version,
+        MODEL_PATH,
+        metadata["macro_f1"],
+        metadata["accuracy"],
+        metadata["improved_over_baseline"],
+    )
+    return metadata, evaluation
 
 
 if __name__ == "__main__":

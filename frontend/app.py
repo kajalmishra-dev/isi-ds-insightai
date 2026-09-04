@@ -227,8 +227,127 @@ def inject_styles() -> None:
         .rank-item:last-child { border-bottom: none; }
 
         .rank-item .count {
-            color: var(--muted) !important;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 2rem;
+            padding: 0.15rem 0.55rem;
+            border-radius: 980px;
+            background: #f5f5f7;
+            color: var(--ink) !important;
             font-variant-numeric: tabular-nums;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .alerts-card {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 1rem 1.15rem;
+            margin: 0.75rem 0 1rem;
+        }
+
+        .alerts-card .alerts-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: var(--faint) !important;
+            margin: 0 0 0.65rem;
+        }
+
+        .alerts-card ul {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .alerts-card li {
+            display: flex;
+            gap: 0.55rem;
+            align-items: flex-start;
+            padding: 0.4rem 0;
+            border-bottom: 1px solid var(--line);
+            color: var(--ink) !important;
+            font-size: 0.92rem;
+            line-height: 1.4;
+        }
+
+        .alerts-card li:last-child { border-bottom: none; }
+
+        .alert-tag {
+            flex: 0 0 auto;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            padding: 0.18rem 0.45rem;
+            border-radius: 6px;
+            margin-top: 0.1rem;
+        }
+
+        .alert-tag.warn { background: #fef3c7; color: #92400e; }
+        .alert-tag.critical { background: #fee2e2; color: #991b1b; }
+        .alert-tag.info { background: #e8f1ff; color: #1d4ed8; }
+
+        .skeleton-card {
+            background: var(--surface);
+            border: 1px dashed #d2d2d7;
+            border-radius: var(--radius);
+            padding: 1.25rem 1.35rem;
+            color: var(--faint) !important;
+        }
+
+        .skeleton-card .skel-label {
+            height: 0.7rem;
+            width: 35%;
+            background: #ececef;
+            border-radius: 4px;
+            margin-bottom: 0.85rem;
+        }
+
+        .skeleton-card .skel-title {
+            height: 1.35rem;
+            width: 55%;
+            background: #e5e5ea;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+
+        .skeleton-card .skel-bar {
+            height: 0.55rem;
+            width: 100%;
+            background: #ececef;
+            border-radius: 980px;
+            margin: 0.85rem 0 0.35rem;
+            overflow: hidden;
+        }
+
+        .skeleton-card .skel-bar > span {
+            display: block;
+            height: 100%;
+            width: 42%;
+            background: #d2d2d7;
+            border-radius: 980px;
+        }
+
+        .skeleton-card .skel-meta {
+            font-size: 0.85rem;
+            color: var(--muted) !important;
+            margin-top: 0.75rem;
+        }
+
+        .pager {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            margin-top: 0.65rem;
+            padding-top: 0.65rem;
+            border-top: 1px solid var(--line);
+            color: var(--muted) !important;
             font-size: 0.85rem;
         }
 
@@ -607,9 +726,10 @@ def empty_state(title: str, body: str) -> None:
 
 
 def style_review_frame(df: pd.DataFrame) -> pd.DataFrame:
+    """Human-readable review table (neutral rows; confidence as 0–100 for ProgressColumn)."""
     view = df.copy()
     if "confidence" in view.columns:
-        view["confidence"] = view["confidence"].map(format_confidence)
+        view["confidence"] = (pd.to_numeric(view["confidence"], errors="coerce") * 100).round(1)
     if "category" in view.columns:
         view["category"] = view["category"].map(label_category)
     if "created_at" in view.columns:
@@ -618,6 +738,37 @@ def style_review_frame(df: pd.DataFrame) -> pd.DataFrame:
         view["job_id"] = view["job_id"].map(format_job_id)
     cols = [c for c in ["text", "category", "confidence", "created_at", "job_id"] if c in view.columns]
     return view[cols]
+
+
+def _alert_tag_for(code: str) -> tuple[str, str]:
+    if code in {"review_overload", "sla_risk", "weakest_confidence"}:
+        return "critical", "Critical"
+    if code in {"elevated_review"}:
+        return "warn", "Watch"
+    return "info", "Info"
+
+
+def render_system_alerts(insights: list[dict[str, Any]]) -> None:
+    if not insights:
+        return
+    items = []
+    for item in insights:
+        code = str(item.get("code") or "")
+        if code == "insufficient_data":
+            continue
+        tag_cls, tag_label = _alert_tag_for(code)
+        text = item.get("text", item)
+        items.append(
+            f'<li><span class="alert-tag {tag_cls}">{tag_label}</span>'
+            f"<span>{text}</span></li>"
+        )
+    if not items:
+        return
+    st.markdown(
+        '<div class="alerts-card"><div class="alerts-title">System alerts</div>'
+        f"<ul>{''.join(items)}</ul></div>",
+        unsafe_allow_html=True,
+    )
 
 
 def render_job_panel() -> None:
@@ -706,18 +857,9 @@ def render_overview(data: dict[str, Any]) -> None:
     )
     st.markdown(f'<div class="kpi-row">{kpis}</div>', unsafe_allow_html=True)
 
-    insights = data.get("insights") or []
-    for item in insights:
-        code = item.get("code", "")
-        css = "alert-banner elevated" if code == "elevated_review" else "alert-banner"
-        if code in {"insufficient_data"}:
-            css = "alert-banner elevated"
-        st.markdown(
-            f'<div class="{css}">{item.get("text", item)}</div>',
-            unsafe_allow_html=True,
-        )
+    render_system_alerts(data.get("insights") or [])
 
-    left, right = st.columns([1.2, 1], gap="large")
+    left, right = st.columns([1.25, 1], gap="large")
     with left:
         st.markdown(
             '<div class="panel"><div class="panel-title">Category distribution</div>',
@@ -853,19 +995,13 @@ def render_overview(data: dict[str, Any]) -> None:
                                 st.error(friendly_http_error("Retry failed", retry_res))
         st.markdown("</div>", unsafe_allow_html=True)
 
-    s1, s2, s3 = st.columns(3)
-    s1.metric("Within 24h", data.get("within_24h_count", 0))
-    s2.metric("Unresolved", data.get("unresolved_count", 0))
-    s3.metric("24h SLA", f"{data.get('north_star_metric', 0)}%")
-
 
 def render_review_queue(data: dict[str, Any]) -> None:
     count = int(data.get("needs_review_count") or 0)
     st.markdown(
         f"""
         <div class="review-banner">
-            <strong>{count} pending review</strong> — confidence below threshold.
-            Approve or reclassify to clear the queue.
+            <strong>{count} pending review</strong> — click a table row to triage on the right.
         </div>
         """,
         unsafe_allow_html=True,
@@ -873,10 +1009,7 @@ def render_review_queue(data: dict[str, Any]) -> None:
 
     review_df = st.session_state.review_data
     if review_df is None or review_df.empty:
-        empty_state(
-            "Review queue is empty",
-            "No items need review right now.",
-        )
+        empty_state("Review queue is empty", "No items need review right now.")
         return
 
     if "review_selected_id" not in st.session_state:
@@ -886,26 +1019,43 @@ def render_review_queue(data: dict[str, Any]) -> None:
     if st.session_state.review_selected_id not in ids:
         st.session_state.review_selected_id = ids[0]
 
-    left, right = st.columns([1.35, 1], gap="large")
+    left, right = st.columns([1.4, 1], gap="large")
     with left:
-        st.caption(f"{len(review_df)} shown · lowest confidence first")
-        st.dataframe(style_review_frame(review_df), use_container_width=True, hide_index=True)
-        st.session_state.review_selected_id = st.selectbox(
-            "Select row to triage",
-            options=ids,
-            index=ids.index(st.session_state.review_selected_id),
-            format_func=lambda cid: str(
-                review_df.loc[review_df["id"] == cid, "text"].iloc[0]
-            )[:90],
+        st.caption(f"{len(review_df)} shown · lowest confidence first · click a row")
+        display = style_review_frame(review_df)
+        event = st.dataframe(
+            display,
+            use_container_width=True,
+            hide_index=True,
+            on_select="rerun",
+            selection_mode="single-row",
+            key="review_queue_table",
+            column_config={
+                "confidence": st.column_config.ProgressColumn(
+                    "Confidence",
+                    help="Model confidence (max-probability)",
+                    format="%.1f%%",
+                    min_value=0,
+                    max_value=100,
+                ),
+                "text": st.column_config.TextColumn("Complaint", width="large"),
+            },
         )
+        selected_rows = []
+        if event is not None and getattr(event, "selection", None) is not None:
+            selected_rows = list(event.selection.rows or [])
+        if selected_rows:
+            st.session_state.review_selected_id = int(review_df.iloc[selected_rows[0]]["id"])
 
     row = review_df.loc[review_df["id"] == st.session_state.review_selected_id].iloc[0]
     with right:
         st.markdown("**Triage**")
         st.write(row.get("text", ""))
+        conf_pct = float(row.get("confidence") or 0) * 100
+        conf_label = "Low" if conf_pct < 30 else ("Medium" if conf_pct < 50 else "OK")
         st.caption(
             f"Suggested: **{label_category(row.get('category'))}** · "
-            f"{format_confidence(row.get('confidence'))} · "
+            f"{format_confidence(row.get('confidence'))} ({conf_label}) · "
             f"Job {format_job_id(row.get('job_id'))}"
         )
         options = list(TRIAGE_CATEGORIES)
@@ -917,6 +1067,7 @@ def render_review_queue(data: dict[str, Any]) -> None:
             options=options,
             index=options.index(current),
             format_func=label_category,
+            key=f"triage_cat_{int(row['id'])}",
         )
         if st.button("Approve / Submit", type="primary", use_container_width=True):
             try:
@@ -937,22 +1088,33 @@ def render_review_queue(data: dict[str, Any]) -> None:
 
 def render_explorer(data: dict[str, Any]) -> None:
     saved = st.session_state.get("explorer_params") or {}
-    f1, f2, f3, f4 = st.columns(4)
-    with f1:
+    reverse_map = {
+        label_category(c): c for c in (data.get("category_distribution") or {})
+    }
+
+    st.caption("Filters update automatically · Export downloads the current filter set")
+    t1, t2, t3, t4, t5 = st.columns([2.2, 1.1, 1.1, 1.1, 1.0])
+    with t1:
         search_q = st.text_input(
-            "Search text",
+            "Search",
             value=str(saved.get("search") or ""),
-            placeholder="e.g. invoice",
+            placeholder="Search complaint text…",
+            label_visibility="collapsed",
         )
-    with f2:
+    with t2:
         category_options = ["(all)"] + sorted(
             {label_category(c) for c in (data.get("category_distribution") or {})}
         )
         saved_cat = saved.get("category")
         cat_label = label_category(saved_cat) if saved_cat else "(all)"
         cat_index = category_options.index(cat_label) if cat_label in category_options else 0
-        category_q = st.selectbox("Category", options=category_options, index=cat_index)
-    with f3:
+        category_q = st.selectbox(
+            "Category",
+            options=category_options,
+            index=cat_index,
+            label_visibility="collapsed",
+        )
+    with t3:
         review_options = ["(all)", "yes", "no"]
         saved_review = saved.get("needs_review")
         if saved_review is True:
@@ -965,16 +1127,18 @@ def render_explorer(data: dict[str, Any]) -> None:
             "Needs Review",
             options=review_options,
             index=review_options.index(review_default),
+            label_visibility="collapsed",
         )
-    with f4:
+    with t4:
         sort_options = ["created_at", "confidence", "category", "id"]
         sort_default = saved.get("sort_by", "created_at")
         sort_index = sort_options.index(sort_default) if sort_default in sort_options else 0
-        sort_q = st.selectbox("Sort by", options=sort_options, index=sort_index)
-
-    reverse_map = {
-        label_category(c): c for c in (data.get("category_distribution") or {})
-    }
+        sort_q = st.selectbox(
+            "Sort by",
+            options=sort_options,
+            index=sort_index,
+            label_visibility="collapsed",
+        )
 
     def _explorer_filters(page: int = 1) -> dict[str, Any]:
         return {
@@ -989,29 +1153,32 @@ def render_explorer(data: dict[str, Any]) -> None:
             "page_size": int(saved.get("page_size") or 50),
         }
 
-    if st.button("Apply filters"):
+    current = _explorer_filters(page=int(saved.get("page") or 1))
+    filter_keys = ("search", "category", "needs_review", "sort_by", "sort_order", "page_size")
+    filters_changed = any(current.get(k) != saved.get(k) for k in filter_keys)
+    if filters_changed:
         load_dashboard_data(_explorer_filters(page=1))
         st.rerun()
 
     export_params = {
-        "search": search_q.strip() or None,
-        "category": None
-        if category_q == "(all)"
-        else reverse_map.get(category_q, category_q),
-        "needs_review": None if review_q == "(all)" else review_q == "yes",
+        "search": current.get("search"),
+        "category": current.get("category"),
+        "needs_review": current.get("needs_review"),
     }
     export_params = {k: v for k, v in export_params.items() if v not in (None, "")}
-    try:
-        export_res = api_get("/complaints/export.csv", params=export_params or None)
-        if export_res.status_code == 200:
-            st.download_button(
-                "Export filtered CSV",
-                data=export_res.content,
-                file_name="insightai_complaints.csv",
-                mime="text/csv",
-            )
-    except requests.RequestException:
-        st.caption("Could not prepare filtered export.")
+    with t5:
+        try:
+            export_res = api_get("/complaints/export.csv", params=export_params or None)
+            if export_res.status_code == 200:
+                st.download_button(
+                    "Export CSV",
+                    data=export_res.content,
+                    file_name="insightai_complaints.csv",
+                    mime="text/csv",
+                    use_container_width=True,
+                )
+        except requests.RequestException:
+            st.caption("Export unavailable")
 
     df = st.session_state.complaints_data
     meta = st.session_state.get("complaints_meta") or {}
@@ -1021,7 +1188,7 @@ def render_explorer(data: dict[str, Any]) -> None:
 
     view = df.copy()
     if "confidence" in view.columns:
-        view["confidence"] = view["confidence"].map(format_confidence)
+        view["confidence"] = (pd.to_numeric(view["confidence"], errors="coerce") * 100).round(1)
     if "category" in view.columns:
         view["category_label"] = view["category"].map(label_category)
     if "created_at" in view.columns:
@@ -1038,31 +1205,34 @@ def render_explorer(data: dict[str, Any]) -> None:
     ]
     page = int(meta.get("page", 1) or 1)
     total_pages = max(1, int(meta.get("total_pages", 1) or 1))
-    st.caption(
-        f"Page {page} / {total_pages} · "
-        f"{meta.get('total', len(view))} matching"
-    )
-
     display = view[show_cols].rename(columns={"category_label": "category"})
-    if "needs_review" in view.columns:
-        flags = view["needs_review"].fillna(False).astype(bool)
 
-        def _highlight(row: pd.Series) -> list[str]:
-            return (
-                ["background-color: #fff6e5"] * len(row)
-                if bool(flags.loc[row.name])
-                else [""] * len(row)
-            )
-
-        st.dataframe(display.style.apply(_highlight, axis=1), use_container_width=True, hide_index=True)
-    else:
-        st.dataframe(display, use_container_width=True, hide_index=True)
+    st.dataframe(
+        display,
+        use_container_width=True,
+        hide_index=True,
+        column_config={
+            "confidence": st.column_config.ProgressColumn(
+                "Confidence",
+                format="%.1f%%",
+                min_value=0,
+                max_value=100,
+            ),
+            "text": st.column_config.TextColumn("Complaint", width="large"),
+        },
+    )
 
     nav1, nav2, nav3 = st.columns([1, 2, 1])
     with nav1:
         if st.button("← Previous", disabled=page <= 1, use_container_width=True):
             load_dashboard_data(_explorer_filters(page=page - 1))
             st.rerun()
+    with nav2:
+        st.markdown(
+            f'<div style="text-align:center;color:#6e6e73;padding-top:0.45rem;">'
+            f"Page {page} / {total_pages} · {meta.get('total', len(view))} matching</div>",
+            unsafe_allow_html=True,
+        )
     with nav3:
         if st.button("Next →", disabled=page >= total_pages, use_container_width=True):
             load_dashboard_data(_explorer_filters(page=page + 1))
@@ -1094,15 +1264,23 @@ def render_live_classify() -> None:
         run = st.button("Classify", type="primary", use_container_width=True)
 
     with right:
-        if not run or not str(st.session_state.get("live_classify_text", "")).strip():
-            empty_state("Prediction", "Enter text or tap a sample, then Classify.")
+        text = str(st.session_state.get("live_classify_text", "")).strip()
+        if not run or not text:
+            st.markdown(
+                """
+                <div class="skeleton-card">
+                    <div class="skel-label"></div>
+                    <div class="skel-title"></div>
+                    <div class="skel-bar"><span></span></div>
+                    <div class="skel-meta">Predicted category and confidence will appear here.</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
             return
         with st.spinner("Classifying…"):
             try:
-                pred = api_post(
-                    "/predict",
-                    json={"text": str(st.session_state.live_classify_text).strip()},
-                )
+                pred = api_post("/predict", json={"text": text})
             except requests.RequestException as exc:
                 st.error(f"Classification request failed: {exc}")
                 return

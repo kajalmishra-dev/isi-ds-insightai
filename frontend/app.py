@@ -11,7 +11,6 @@ from typing import Any
 
 import pandas as pd
 import plotly.express as px
-import plotly.graph_objects as go
 import requests
 import streamlit as st
 
@@ -1197,7 +1196,7 @@ def render_overview(data: dict[str, Any]) -> None:
         )
         return
 
-    left, right = st.columns([1.35, 1], gap="large")
+    left, right = st.columns([1.45, 1], gap="large")
     with left:
         st.markdown(
             '<div class="panel"><div class="panel-title">Category distribution</div>',
@@ -1246,9 +1245,9 @@ def render_overview(data: dict[str, Any]) -> None:
                 color="Category",
                 color_discrete_map=color_map,
             )
-            fig.update_traces(marker_line_width=0, width=0.62)
+            fig.update_traces(marker_line_width=0, width=0.55)
             fig.update_layout(
-                margin=dict(l=10, r=24, t=10, b=10),
+                margin=dict(l=8, r=16, t=4, b=4),
                 xaxis_title="",
                 yaxis_title="",
                 showlegend=False,
@@ -1262,48 +1261,13 @@ def render_overview(data: dict[str, Any]) -> None:
                 xaxis=dict(
                     gridcolor="#f0f0f2",
                     zeroline=False,
-                    range=[0, max(100, float(cat_df["Percentage"].max()) * 1.12)],
+                    range=[0, max(40, float(cat_df["Percentage"].max()) * 1.25)],
                     ticksuffix="%",
                 ),
                 yaxis=dict(gridcolor="#ffffff"),
-                height=max(280, 64 * len(cat_df) + 80),
+                height=max(240, 52 * len(cat_df) + 56),
             )
             st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
-
-            # Donut mix for a stronger dashboard feel
-            pie = go.Figure(
-                data=[
-                    go.Pie(
-                        labels=cat_df["Category"],
-                        values=cat_df["Count"],
-                        hole=0.58,
-                        marker=dict(
-                            colors=[color_map[c] for c in cat_df["Category"]],
-                            line=dict(color="#ffffff", width=2),
-                        ),
-                        textinfo="label+percent",
-                        textposition="outside",
-                        hovertemplate="%{label}: %{value} (%{percent})<extra></extra>",
-                    )
-                ]
-            )
-            pie.update_layout(
-                margin=dict(l=10, r=10, t=8, b=8),
-                showlegend=False,
-                height=220,
-                paper_bgcolor="#ffffff",
-                font=dict(size=12, color="#1d1d1f"),
-                annotations=[
-                    dict(
-                        text=f"<b>{total}</b><br>total",
-                        x=0.5,
-                        y=0.5,
-                        font_size=14,
-                        showarrow=False,
-                    )
-                ],
-            )
-            st.plotly_chart(pie, use_container_width=True, config={"displayModeBar": False})
         st.markdown("</div>", unsafe_allow_html=True)
 
     with right:
@@ -1514,22 +1478,54 @@ def render_review_queue(data: dict[str, Any]) -> None:
             format_func=label_category,
             key=cat_key,
         )
-        if st.button("Approve / Submit", type="primary", use_container_width=True):
+
+        def _submit_review(category: str, ok_message: str) -> None:
+            complaint_id = int(row["id"])
             try:
                 res = api_post(
-                    f"/complaints/{int(row['id'])}/review",
-                    json={"category": chosen},
+                    f"/complaints/{complaint_id}/review",
+                    json={"category": category},
                 )
             except requests.RequestException as exc:
                 st.error(f"Review failed: {exc}")
-            else:
-                if res.status_code == 200:
-                    st.success("Cleared from review queue")
-                    st.session_state.pop("triage_bound_id", None)
-                    load_dashboard_data()
-                    st.rerun()
+                return
+            if res.status_code == 200:
+                # Advance to the next pending row before reload
+                pending_ids = [
+                    int(x)
+                    for x in (st.session_state.review_data or pd.DataFrame()).get(
+                        "id", []
+                    )
+                    if int(x) != complaint_id
+                ]
+                if pending_ids:
+                    st.session_state.review_selected_id = pending_ids[0]
                 else:
-                    st.error(friendly_http_error("Review failed", res))
+                    st.session_state.pop("review_selected_id", None)
+                st.session_state.pop("triage_bound_id", None)
+                st.session_state.pop("review_queue_table", None)
+                st.success(ok_message)
+                load_dashboard_data()
+                st.rerun()
+            else:
+                st.error(friendly_http_error("Review failed", res))
+
+        approve_col, reject_col = st.columns(2, gap="small")
+        with approve_col:
+            if st.button("Approve", type="primary", use_container_width=True):
+                _submit_review(current, "Approved - next item loaded")
+        with reject_col:
+            if st.button("Reject", use_container_width=True):
+                if chosen == current:
+                    st.warning(
+                        "Pick a different category first, then Reject to correct the model."
+                    )
+                else:
+                    _submit_review(
+                        chosen,
+                        f"Corrected to {label_category(chosen)} - next item loaded",
+                    )
+        st.caption("Approve = keep suggestion. Reject = save a different category.")
         st.markdown("</div>", unsafe_allow_html=True)
 
 
@@ -1969,13 +1965,9 @@ with st.sidebar:
             help="Only needed when AUTH_ENABLED=true on the API.",
             placeholder="Optional",
         )
-
-    version = os.getenv("APP_VERSION", "2.1.0")
-    model_tag = st.session_state.model_version or "model pending"
-    st.markdown(
-        f'<div class="sidebar-footer">v{version} · {model_tag}</div>',
-        unsafe_allow_html=True,
-    )
+        version = os.getenv("APP_VERSION", "2.1.0")
+        model_tag = st.session_state.model_version or "model pending"
+        st.caption(f"v{version} · {model_tag}")
 
 if not st.session_state.bootstrapped and ok and not polling:
     with st.spinner("Loading dashboard…"):

@@ -3,247 +3,190 @@
 << /Type /Catalog /Pages 2 0 R >>
 endobj
 2 0 obj
-<< /Type /Pages /Kids [4 0 R 6 0 R 8 0 R 10 0 R] /Count 4 >>
+<< /Type /Pages /Kids [5 0 R 7 0 R 9 0 R 11 0 R] /Count 4 >>
 endobj
 3 0 obj
 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
 endobj
 4 0 obj
-<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 5 0 R /Resources << /Font << /F1 3 0 R >> >> >>
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
 endobj
 5 0 obj
-<< /Length 1051 >>
-stream
-BT
-/F1 11 Tf
-50 750 Td
-/F1 20 Tf
-(InsightAI Feature Guide) Tj
-0 -14 Td
-/F1 11 Tf
-(Complaint intelligence for classify, review, and SLA tracking.) Tj
-0 -14 Td
-/F1 11 Tf
-(Version 2.1 - demo walkthrough for operators and stakeholders.) Tj
-0 -14 Td
-/F1 11 Tf
-() Tj
-0 -18 Td
-/F1 13 Tf
-(1. What InsightAI does) Tj
-0 -14 Td
-/F1 11 Tf
-(Upload a CSV of complaint texts. The model classifies each row into) Tj
-0 -14 Td
-/F1 11 Tf
-(Billing, Shipping, Service, or Technical, scores confidence, and flags) Tj
-0 -14 Td
-/F1 11 Tf
-(low-confidence rows for human review. Analytics track volume, mix,) Tj
-0 -14 Td
-/F1 11 Tf
-(resolution SLAs, and system alerts.) Tj
-0 -14 Td
-/F1 11 Tf
-() Tj
-0 -18 Td
-/F1 13 Tf
-(2. Quick demo path) Tj
-0 -14 Td
-/F1 11 Tf
-(- Download sample CSV from the sidebar \(48 held-out complaints\).) Tj
-0 -14 Td
-/F1 11 Tf
-(- Click Upload, select the file, then Ingest data.) Tj
-0 -14 Td
-/F1 11 Tf
-(- Wait for the job to complete, then open Overview.) Tj
-0 -14 Td
-/F1 11 Tf
-(- Triage Needs Review items, then explore filters and Live Classify.) Tj
-ET
-endstream
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 6 0 R /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> >>
 endobj
 6 0 obj
-<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 7 0 R /Resources << /Font << /F1 3 0 R >> >> >>
+<< /Length 802 >>
+stream
+0.000 0.443 0.890 rg 0.0 0.0 612.0 792.0 re f
+0.114 0.114 0.122 rg 0.0 0.0 612.0 220.0 re f
+BT /F2 36.0 Tf 1.000 1.000 1.000 rg 48.0 620.0 Td (InsightAI) Tj ET
+BT /F1 22.0 Tf 1.000 1.000 1.000 rg 48.0 590.0 Td (Feature Guide) Tj ET
+1.000 0.624 0.039 rg 48.0 568.0 64.0 4.0 re f
+BT /F1 12.0 Tf 1.000 1.000 1.000 rg 48.0 540.0 Td (Complaint intelligence for classify, review,) Tj ET
+BT /F1 12.0 Tf 1.000 1.000 1.000 rg 48.0 522.0 Td (and resolution SLA tracking.) Tj ET
+BT /F1 10.0 Tf 1.000 1.000 1.000 rg 48.0 160.0 Td (Demo walkthrough  ·  v2.1  ·  FastAPI + Streamlit + ML) Tj ET
+BT /F1 10.0 Tf 0.800 0.850 1.000 rg 48.0 140.0 Td (Billing  ·  Shipping  ·  Service  ·  Technical) Tj ET
+BT /F1 9.0 Tf 0.750 0.800 0.950 rg 48.0 40.0 Td (Download sample CSV from the sidebar to run the guided demo.) Tj ET
+endstream
 endobj
 7 0 obj
-<< /Length 924 >>
-stream
-BT
-/F1 11 Tf
-50 750 Td
-/F1 13 Tf
-(3. Overview) Tj
-0 -14 Td
-/F1 11 Tf
-(KPI cards: total complaints, resolved under 24h, needs-review count,) Tj
-0 -14 Td
-/F1 11 Tf
-(and median resolution time. Semantic colors \(red/amber\) appear only for) Tj
-0 -14 Td
-/F1 11 Tf
-(risk states on Needs Review - not decoration.) Tj
-0 -14 Td
-/F1 11 Tf
-() Tj
-0 -14 Td
-/F1 11 Tf
-(System alerts highlight actionable anomalies \(review overload, weak) Tj
-0 -14 Td
-/F1 11 Tf
-(class confidence, SLA risk\).) Tj
-0 -14 Td
-/F1 11 Tf
-() Tj
-0 -14 Td
-/F1 11 Tf
-(Charts: colored category bars plus a donut mix so volume share is) Tj
-0 -14 Td
-/F1 11 Tf
-(obvious at a glance. Recent ingestion jobs sit beside the charts with) Tj
-0 -14 Td
-/F1 11 Tf
-(export and retry when a run fails.) Tj
-0 -14 Td
-/F1 11 Tf
-() Tj
-0 -14 Td
-/F1 11 Tf
-(If Needs Review is above zero, use Triage pending reviews to jump) Tj
-0 -14 Td
-/F1 11 Tf
-(straight into the Review Queue.) Tj
-ET
-endstream
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 8 0 R /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> >>
 endobj
 8 0 obj
-<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 9 0 R /Resources << /Font << /F1 3 0 R >> >> >>
-endobj
-9 0 obj
-<< /Length 960 >>
+<< /Length 3141 >>
 stream
-BT
-/F1 11 Tf
-50 750 Td
-/F1 13 Tf
-(4. Review Queue) Tj
-0 -14 Td
-/F1 11 Tf
-(Lists low-confidence complaints, lowest confidence first. Click a row) Tj
-0 -14 Td
-/F1 11 Tf
-(to open Triage. The dropdown defaults to the model suggestion so you) Tj
-0 -14 Td
-/F1 11 Tf
-(can Approve / Submit in one click when the label is correct, or change) Tj
-0 -14 Td
-/F1 11 Tf
-(the category when it is not.) Tj
-0 -14 Td
-/F1 11 Tf
-() Tj
-0 -14 Td
-/F1 11 Tf
-(Each submit clears needs_review and marks the row human_reviewed so) Tj
-0 -14 Td
-/F1 11 Tf
-(Overview can show how many labels you corrected for future retraining.) Tj
-0 -14 Td
-/F1 11 Tf
-() Tj
-0 -14 Td
-/F1 11 Tf
-(When the queue is empty, return to Overview for refreshed KPIs.) Tj
-0 -14 Td
-/F1 11 Tf
-() Tj
-0 -18 Td
-/F1 13 Tf
-(5. Complaint Explorer) Tj
-0 -14 Td
-/F1 11 Tf
-(Search and filter by category, review status, and sort. Export CSV uses) Tj
-0 -14 Td
-/F1 11 Tf
-(the active filters. Pagination sits under the table.) Tj
-ET
+0.000 0.443 0.890 rg 0.0 742.0 612.0 50.0 re f
+BT /F2 18.0 Tf 1.000 1.000 1.000 rg 40.0 762.0 Td (Product tour) Tj ET
+BT /F1 9.0 Tf 1.000 1.000 1.000 rg 40.0 748.0 Td (What each screen is for) Tj ET
+1.000 0.624 0.039 rg 40.0 730.0 80.0 3.0 re f
+0.000 0.443 0.890 rg 40.0 693.0 6.0 16.0 re f
+BT /F2 13.0 Tf 0.114 0.114 0.122 rg 54.0 697.0 Td (Categories the model predicts) Tj ET
+0.000 0.443 0.890 rg 40.0 671.0 51.4 18.0 re f
+BT /F2 9.0 Tf 1.000 1.000 1.000 rg 48.0 675.0 Td (Billing) Tj ET
+0.204 0.780 0.349 rg 101.4 671.0 57.6 18.0 re f
+BT /F2 9.0 Tf 1.000 1.000 1.000 rg 109.4 675.0 Td (Shipping) Tj ET
+1.000 0.624 0.039 rg 169.0 671.0 51.4 18.0 re f
+BT /F2 9.0 Tf 1.000 1.000 1.000 rg 177.0 675.0 Td (Service) Tj ET
+0.686 0.322 0.871 rg 230.4 671.0 63.8 18.0 re f
+BT /F2 9.0 Tf 1.000 1.000 1.000 rg 238.4 675.0 Td (Technical) Tj ET
+BT /F1 10.5 Tf 0.114 0.114 0.122 rg 40.0 645.0 Td (Low-confidence predictions are flagged Needs Review \(red semantic state\) so humans) Tj ET
+BT /F1 10.5 Tf 0.114 0.114 0.122 rg 40.0 631.0 Td (can approve or reclassify before analytics treat them as final.) Tj ET
+0.000 0.443 0.890 rg 40.0 601.0 6.0 16.0 re f
+BT /F2 13.0 Tf 0.114 0.114 0.122 rg 54.0 605.0 Td (4-step demo path) Tj ET
+0.000 0.443 0.890 rg 40.0 577.0 22.0 22.0 re f
+BT /F2 11.0 Tf 1.000 1.000 1.000 rg 46.5 583.0 Td (1) Tj ET
+BT /F2 11.0 Tf 0.114 0.114 0.122 rg 72.0 585.0 Td (Download sample CSV) Tj ET
+BT /F1 10.0 Tf 0.431 0.431 0.451 rg 72.0 569.0 Td (Use the sidebar button - 48 held-out demo complaints, not the training file.) Tj ET
+0.000 0.443 0.890 rg 40.0 542.0 22.0 22.0 re f
+BT /F2 11.0 Tf 1.000 1.000 1.000 rg 46.5 548.0 Td (2) Tj ET
+BT /F2 11.0 Tf 0.114 0.114 0.122 rg 72.0 550.0 Td (Upload + Ingest) Tj ET
+BT /F1 10.0 Tf 0.431 0.431 0.451 rg 72.0 534.0 Td (Start an async job. Watch progress, then open Overview when it completes.) Tj ET
+0.000 0.443 0.890 rg 40.0 507.0 22.0 22.0 re f
+BT /F2 11.0 Tf 1.000 1.000 1.000 rg 46.5 513.0 Td (3) Tj ET
+BT /F2 11.0 Tf 0.114 0.114 0.122 rg 72.0 515.0 Td (Triage the queue) Tj ET
+BT /F1 10.0 Tf 0.431 0.431 0.451 rg 72.0 499.0 Td (Jump from Needs Review into Review Queue. Approve or fix labels in one) Tj ET
+BT /F1 10.0 Tf 0.431 0.431 0.451 rg 72.0 486.0 Td (click.) Tj ET
+0.000 0.443 0.890 rg 40.0 459.0 22.0 22.0 re f
+BT /F2 11.0 Tf 1.000 1.000 1.000 rg 46.5 465.0 Td (4) Tj ET
+BT /F2 11.0 Tf 0.114 0.114 0.122 rg 72.0 467.0 Td (Explore + Live Classify) Tj ET
+BT /F1 10.0 Tf 0.431 0.431 0.451 rg 72.0 451.0 Td (Filter the corpus, export CSV, then try sample chips in Live Classification.) Tj ET
+0.945 0.965 1.000 rg 0.80 w 0.910 0.910 0.930 RG 40.0 388.0 532.0 54.0 re B
+0.000 0.443 0.890 rg 40.0 388.0 5.0 54.0 re f
+BT /F2 10.0 Tf 0.000 0.443 0.890 rg 56.0 426.0 Td (Tip) Tj ET
+BT /F1 10.0 Tf 0.114 0.114 0.122 rg 56.0 412.0 Td (Do not upload data/complaints.csv for demos. That file is for python -m) Tj ET
+BT /F1 10.0 Tf 0.114 0.114 0.122 rg 56.0 399.0 Td (ml.train only.) Tj ET
+0.910 0.910 0.930 rg 40.0 36.0 532.0 0.6 re f
+BT /F1 8.0 Tf 0.431 0.431 0.451 rg 40.0 22.0 Td (InsightAI  ·  Feature Guide  ·  v2.1) Tj ET
+BT /F1 8.0 Tf 0.431 0.431 0.451 rg 520.0 22.0 Td (2/4) Tj ET
 endstream
 endobj
+9 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 10 0 R /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> >>
+endobj
 10 0 obj
-<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 11 0 R /Resources << /Font << /F1 3 0 R >> >> >>
+<< /Length 2763 >>
+stream
+0.000 0.443 0.890 rg 0.0 742.0 612.0 50.0 re f
+BT /F2 18.0 Tf 1.000 1.000 1.000 rg 40.0 762.0 Td (Screens) Tj ET
+BT /F1 9.0 Tf 1.000 1.000 1.000 rg 40.0 748.0 Td (Overview · Review · Explorer · Live) Tj ET
+1.000 0.624 0.039 rg 40.0 730.0 80.0 3.0 re f
+0.000 0.443 0.890 rg 40.0 693.0 6.0 16.0 re f
+BT /F2 13.0 Tf 0.114 0.114 0.122 rg 54.0 697.0 Td (Overview) Tj ET
+0.000 0.443 0.890 rg 46.0 677.0 4.0 4.0 re f
+BT /F1 10.5 Tf 0.114 0.114 0.122 rg 58.0 675.0 Td (KPI strip: volume, SLA under 24h, needs-review load, median resolution.) Tj ET
+0.000 0.443 0.890 rg 46.0 661.0 4.0 4.0 re f
+BT /F1 10.5 Tf 0.114 0.114 0.122 rg 58.0 659.0 Td (Colored category bars + donut mix for share-of-volume.) Tj ET
+0.000 0.443 0.890 rg 46.0 645.0 4.0 4.0 re f
+BT /F1 10.5 Tf 0.114 0.114 0.122 rg 58.0 643.0 Td (System alerts for review overload, weak classes, and SLA risk.) Tj ET
+0.000 0.443 0.890 rg 46.0 629.0 4.0 4.0 re f
+BT /F1 10.5 Tf 0.114 0.114 0.122 rg 58.0 627.0 Td (Triage N pending reviews routes you straight into the Review Queue.) Tj ET
+0.000 0.443 0.890 rg 40.0 599.0 6.0 16.0 re f
+BT /F2 13.0 Tf 0.114 0.114 0.122 rg 54.0 603.0 Td (Review Queue) Tj ET
+0.000 0.443 0.890 rg 46.0 583.0 4.0 4.0 re f
+BT /F1 10.5 Tf 0.114 0.114 0.122 rg 58.0 581.0 Td (Lowest confidence first. Row selection highlights the triage card.) Tj ET
+0.000 0.443 0.890 rg 46.0 567.0 4.0 4.0 re f
+BT /F1 10.5 Tf 0.114 0.114 0.122 rg 58.0 565.0 Td (Dropdown defaults to the model suggestion - Approve / Submit in one click.) Tj ET
+0.000 0.443 0.890 rg 46.0 551.0 4.0 4.0 re f
+BT /F1 10.5 Tf 0.114 0.114 0.122 rg 58.0 549.0 Td (Human reviews mark feedback for future retraining.) Tj ET
+0.000 0.443 0.890 rg 40.0 521.0 6.0 16.0 re f
+BT /F2 13.0 Tf 0.114 0.114 0.122 rg 54.0 525.0 Td (Complaint Explorer) Tj ET
+0.000 0.443 0.890 rg 46.0 505.0 4.0 4.0 re f
+BT /F1 10.5 Tf 0.114 0.114 0.122 rg 58.0 503.0 Td (Labeled filters: Category, Review, Sort - plus search and filtered export.) Tj ET
+0.000 0.443 0.890 rg 46.0 489.0 4.0 4.0 re f
+BT /F1 10.5 Tf 0.114 0.114 0.122 rg 58.0 487.0 Td (Compact timestamps; job IDs stay out of the main grid.) Tj ET
+0.000 0.443 0.890 rg 40.0 459.0 6.0 16.0 re f
+BT /F2 13.0 Tf 0.114 0.114 0.122 rg 54.0 463.0 Td (Live Classification) Tj ET
+0.000 0.443 0.890 rg 46.0 443.0 4.0 4.0 re f
+BT /F1 10.5 Tf 0.114 0.114 0.122 rg 58.0 441.0 Td (Paste text or try a sample chip, then Classify.) Tj ET
+0.000 0.443 0.890 rg 46.0 427.0 4.0 4.0 re f
+BT /F1 10.5 Tf 0.114 0.114 0.122 rg 58.0 425.0 Td (Result card: category badge, confidence bar, and runner-up alternatives.) Tj ET
+0.910 0.910 0.930 rg 40.0 36.0 532.0 0.6 re f
+BT /F1 8.0 Tf 0.431 0.431 0.451 rg 40.0 22.0 Td (InsightAI  ·  Feature Guide  ·  v2.1) Tj ET
+BT /F1 8.0 Tf 0.431 0.431 0.451 rg 520.0 22.0 Td (3/4) Tj ET
+endstream
 endobj
 11 0 obj
-<< /Length 1079 >>
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 12 0 R /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> >>
+endobj
+12 0 obj
+<< /Length 2925 >>
 stream
-BT
-/F1 11 Tf
-50 750 Td
-/F1 13 Tf
-(6. Live Classification) Tj
-0 -14 Td
-/F1 11 Tf
-(Paste any complaint \(or pick a sample chip\) and Classify. The result) Tj
-0 -14 Td
-/F1 11 Tf
-(card shows the primary category badge, confidence percent with a bar,) Tj
-0 -14 Td
-/F1 11 Tf
-(and runner-up alternatives so you can see model uncertainty live.) Tj
-0 -14 Td
-/F1 11 Tf
-() Tj
-0 -18 Td
-/F1 13 Tf
-(7. Sidebar) Tj
-0 -14 Td
-/F1 11 Tf
-(- Status dot: API online/offline.) Tj
-0 -14 Td
-/F1 11 Tf
-(- Download sample CSV: safe demo file \(not the training set\).) Tj
-0 -14 Td
-/F1 11 Tf
-(- Feature guide PDF: this document.) Tj
-0 -14 Td
-/F1 11 Tf
-(- Upload + Ingest: start a classification job.) Tj
-0 -14 Td
-/F1 11 Tf
-(- Settings: optional API key when AUTH_ENABLED=true.) Tj
-0 -14 Td
-/F1 11 Tf
-(- Footer: app version and loaded model tag.) Tj
-0 -14 Td
-/F1 11 Tf
-() Tj
-0 -18 Td
-/F1 13 Tf
-(8. Data notes) Tj
-0 -14 Td
-/F1 11 Tf
-(sample_upload.csv is held-out demo text. complaints.csv is for training) Tj
-0 -14 Td
-/F1 11 Tf
-(only \(python -m ml.train\). Do not upload the training file as a demo.) Tj
-ET
+0.000 0.443 0.890 rg 0.0 742.0 612.0 50.0 re f
+BT /F2 18.0 Tf 1.000 1.000 1.000 rg 40.0 762.0 Td (Sidebar & data) Tj ET
+BT /F1 9.0 Tf 1.000 1.000 1.000 rg 40.0 748.0 Td (Ops controls for demos and deploys) Tj ET
+1.000 0.624 0.039 rg 40.0 730.0 80.0 3.0 re f
+0.000 0.443 0.890 rg 40.0 693.0 6.0 16.0 re f
+BT /F2 13.0 Tf 0.114 0.114 0.122 rg 54.0 697.0 Td (Sidebar controls) Tj ET
+0.000 0.443 0.890 rg 46.0 677.0 4.0 4.0 re f
+BT /F1 10.5 Tf 0.114 0.114 0.122 rg 58.0 675.0 Td (Online / Offline status dot + refresh.) Tj ET
+0.000 0.443 0.890 rg 46.0 661.0 4.0 4.0 re f
+BT /F1 10.5 Tf 0.114 0.114 0.122 rg 58.0 659.0 Td (Download sample CSV - safe demo file.) Tj ET
+0.000 0.443 0.890 rg 46.0 645.0 4.0 4.0 re f
+BT /F1 10.5 Tf 0.114 0.114 0.122 rg 58.0 643.0 Td (Feature guide PDF - this document.) Tj ET
+0.000 0.443 0.890 rg 46.0 629.0 4.0 4.0 re f
+BT /F1 10.5 Tf 0.114 0.114 0.122 rg 58.0 627.0 Td (Upload + Ingest - start classification jobs.) Tj ET
+0.000 0.443 0.890 rg 46.0 613.0 4.0 4.0 re f
+BT /F1 10.5 Tf 0.114 0.114 0.122 rg 58.0 611.0 Td (Settings - optional API key when AUTH_ENABLED=true.) Tj ET
+0.000 0.443 0.890 rg 46.0 597.0 4.0 4.0 re f
+BT /F1 10.5 Tf 0.114 0.114 0.122 rg 58.0 595.0 Td (Footer - app version and loaded model tag.) Tj ET
+0.000 0.443 0.890 rg 40.0 567.0 6.0 16.0 re f
+BT /F2 13.0 Tf 0.114 0.114 0.122 rg 54.0 571.0 Td (Files that matter) Tj ET
+0.945 0.965 1.000 rg 0.80 w 0.910 0.910 0.930 RG 40.0 507.0 532.0 54.0 re B
+0.000 0.443 0.890 rg 40.0 507.0 5.0 54.0 re f
+BT /F2 10.0 Tf 0.000 0.443 0.890 rg 56.0 545.0 Td (data/sample_upload.csv) Tj ET
+BT /F1 10.0 Tf 0.114 0.114 0.122 rg 56.0 531.0 Td (Held-out demo texts \(zero overlap with training\). Download from UI or copy) Tj ET
+BT /F1 10.0 Tf 0.114 0.114 0.122 rg 56.0 518.0 Td (from the repo.) Tj ET
+0.945 0.965 1.000 rg 0.80 w 0.910 0.910 0.930 RG 40.0 466.0 532.0 41.0 re B
+0.000 0.443 0.890 rg 40.0 466.0 5.0 41.0 re f
+BT /F2 10.0 Tf 0.000 0.443 0.890 rg 56.0 491.0 Td (data/complaints.csv) Tj ET
+BT /F1 10.0 Tf 0.114 0.114 0.122 rg 56.0 477.0 Td (Labeled training set for ml.train only. Not for demo uploads.) Tj ET
+1.000 0.970 0.920 rg 0.80 w 0.910 0.910 0.930 RG 40.0 425.0 532.0 41.0 re B
+0.000 0.443 0.890 rg 40.0 425.0 5.0 41.0 re f
+BT /F2 10.0 Tf 0.000 0.443 0.890 rg 56.0 450.0 Td (docs/InsightAI_Feature_Guide.pdf) Tj ET
+BT /F1 10.0 Tf 0.114 0.114 0.122 rg 56.0 436.0 Td (This guide. Regenerate with: python scripts/generate_feature_guide_pdf.py) Tj ET
+BT /F1 10.0 Tf 0.114 0.114 0.122 rg 40.0 413.0 Td (InsightAI is built for a circular workflow: Overview signals risk, Review clears) Tj ET
+BT /F1 10.0 Tf 0.114 0.114 0.122 rg 40.0 399.0 Td (it, Explorer audits the corpus, Live Classify validates the model on new wording.) Tj ET
+0.910 0.910 0.930 rg 40.0 36.0 532.0 0.6 re f
+BT /F1 8.0 Tf 0.431 0.431 0.451 rg 40.0 22.0 Td (InsightAI  ·  Feature Guide  ·  v2.1) Tj ET
+BT /F1 8.0 Tf 0.431 0.431 0.451 rg 520.0 22.0 Td (4/4) Tj ET
 endstream
 endobj
 xref
-0 12
+0 13
 0000000000 65535 f 
 0000000009 00000 n 
 0000000058 00000 n 
 0000000134 00000 n 
 0000000204 00000 n 
-0000000330 00000 n 
-0000001433 00000 n 
-0000001559 00000 n 
-0000002534 00000 n 
-0000002660 00000 n 
-0000003671 00000 n 
-0000003799 00000 n 
-trailer<< /Size 12 /Root 1 0 R >>
+0000000279 00000 n 
+0000000415 00000 n 
+0000001268 00000 n 
+0000001404 00000 n 
+0000004597 00000 n 
+0000004734 00000 n 
+0000007550 00000 n 
+0000007688 00000 n 
+trailer<< /Size 13 /Root 1 0 R >>
 startxref
-4931
+10666
 %%EOF

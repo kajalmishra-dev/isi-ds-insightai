@@ -19,6 +19,26 @@ REQUIRED_COLUMNS = {"text", "created_at", "resolved_at"}
 PROGRESS_COMMIT_EVERY = 5
 
 
+def should_flag_for_review(
+    confidence: float,
+    alternatives: list | None = None,
+) -> bool:
+    """Flag for human review when the model is soft and not a clear winner.
+
+    4-class max-probability is often ~0.3-0.5 even for correct predictions.
+    If top-1 beats top-2 by CONFIDENCE_MARGIN, trust the label automatically.
+    """
+    conf = float(confidence)
+    alts = alternatives or []
+    if not alts:
+        return conf < settings.confidence_threshold
+    second = float(alts[0].get("confidence") or 0.0)
+    margin = conf - second
+    if margin >= settings.confidence_margin:
+        return False
+    return conf < settings.confidence_threshold
+
+
 def _utcnow() -> datetime:
     return datetime.now(timezone.utc)
 
@@ -194,7 +214,9 @@ def process_csv(file_path: str, job_id: str) -> None:
                 prediction = predict(text)
                 confidence = float(prediction["confidence"])
                 category = prediction["category"]
-                needs_review = confidence < settings.confidence_threshold
+                needs_review = should_flag_for_review(
+                    confidence, prediction.get("alternatives")
+                )
             except Exception as exc:
                 logger.warning("Job %s row prediction failed: %s", job_id, exc)
                 errors += 1
@@ -290,13 +312,14 @@ def process_csv(file_path: str, job_id: str) -> None:
 def classify_text(text: str) -> dict:
     prediction = predict(text)
     confidence = float(prediction["confidence"])
-    needs_review = confidence < settings.confidence_threshold
+    alternatives = prediction.get("alternatives", [])
+    needs_review = should_flag_for_review(confidence, alternatives)
     return {
         "category": prediction["category"],
         "confidence": confidence,
         "needs_review": needs_review,
         "model_version": prediction.get("model_version", "unknown"),
-        "alternatives": prediction.get("alternatives", []),
+        "alternatives": alternatives,
     }
 
 

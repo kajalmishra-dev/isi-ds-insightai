@@ -118,7 +118,7 @@ def list_complaints(
 
 
 def _build_insights(summary: AnalyticsSummary) -> list[InsightItem]:
-    """Actionable anomalies only — do not restate KPI cards."""
+    """Actionable anomalies only - do not restate KPI cards."""
     insights: list[InsightItem] = []
     total = summary.total_complaints
 
@@ -137,7 +137,7 @@ def _build_insights(summary: AnalyticsSummary) -> list[InsightItem]:
                 code="review_overload",
                 text=(
                     f"Action required: {summary.needs_review_count} of {total} complaints "
-                    f"({review_rate:.0f}%) need human review — model confidence is too low "
+                    f"({review_rate:.0f}%) need human review - model confidence is too low "
                     "for automatic triage. Retrain, recalibrate, or lower CONFIDENCE_THRESHOLD."
                 ),
             )
@@ -170,7 +170,7 @@ def _build_insights(summary: AnalyticsSummary) -> list[InsightItem]:
                     code="weakest_confidence",
                     text=(
                         f"{weakest_label} has very low average model confidence "
-                        f"({conf * 100:.1f}%) — check training coverage for this class."
+                        f"({conf * 100:.1f}%) - check training coverage for this class."
                     ),
                 )
             )
@@ -195,7 +195,7 @@ def _build_insights(summary: AnalyticsSummary) -> list[InsightItem]:
 
 
 def get_summary(db: Session) -> AnalyticsSummary:
-    """Compute analytics from live data. Raises on failure — never returns fake zeros."""
+    """Compute analytics from live data. Raises on failure - never returns fake zeros."""
     try:
         total = db.query(func.count(Complaint.id)).scalar() or 0
 
@@ -221,6 +221,12 @@ def get_summary(db: Session) -> AnalyticsSummary:
         needs_review_count = (
             db.query(func.count(Complaint.id))
             .filter(Complaint.needs_review.is_(True))
+            .scalar()
+            or 0
+        )
+        human_reviewed_count = (
+            db.query(func.count(Complaint.id))
+            .filter(Complaint.human_reviewed.is_(True))
             .scalar()
             or 0
         )
@@ -273,6 +279,7 @@ def get_summary(db: Session) -> AnalyticsSummary:
             resolved_count=resolved_count,
             unresolved_count=unresolved_count,
             needs_review_count=needs_review_count,
+            human_reviewed_count=human_reviewed_count,
             category_distribution=category_distribution,
             north_star_metric=north_star,
             avg_confidence=avg_confidence,

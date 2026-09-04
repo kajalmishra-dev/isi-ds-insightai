@@ -19,6 +19,8 @@ class Complaint(Base):
     category = Column(String(64), nullable=True, index=True)
     confidence = Column(Float, nullable=True)
     needs_review = Column(Boolean, nullable=False, default=False, index=True)
+    # Set when a human clears the review queue (approve or reclassify).
+    human_reviewed = Column(Boolean, nullable=False, default=False, index=True)
     job_id = Column(String(36), ForeignKey("ingestion_jobs.id"), nullable=True, index=True)
 
     created_at = Column(DateTime, default=utcnow, index=True)

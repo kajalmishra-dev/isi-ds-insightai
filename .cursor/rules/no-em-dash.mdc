@@ -1,0 +1,22 @@
+---
+description: Use ASCII hyphen (-) instead of em dash (—) in UI copy and README
+globs: frontend/**/*,README.md,**/README.md
+alwaysApply: true
+---
+
+# Punctuation: hyphen, not em dash
+
+In **UI copy** (Streamlit labels, captions, banners, empty states, chart labels, alerts) and **README** text, never use the em dash character `—` (U+2014).
+
+Use a plain hyphen-minus instead: `-`
+
+## Examples
+
+- Good: `InsightAI - Complaint Intelligence Platform`
+- Bad: `InsightAI — Complaint Intelligence Platform`
+- Good: `Billing (14) - 29.2%`
+- Bad: `Billing (14) — 29.2%`
+- Good: empty/missing values shown as `-`
+- Bad: empty/missing values shown as `—`
+
+Code comments outside UI/README may keep either style; prefer `-` for consistency when editing nearby.

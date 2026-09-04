@@ -77,6 +77,7 @@ class AnalyticsSummary(BaseModel):
     resolved_count: int
     unresolved_count: int = 0
     needs_review_count: int
+    human_reviewed_count: int = 0
     category_distribution: dict[str, float]
     north_star_metric: float
     avg_confidence: float

@@ -1,4 +1,4 @@
-# InsightAI — Complaint Intelligence Platform
+# InsightAI - Complaint Intelligence Platform
 
 Production-style system for complaint ingestion, ML classification, review queues, SLA analytics, export, and job retry.
 
@@ -31,7 +31,7 @@ Streamlit dashboard  ──HTTP──►  FastAPI /api/v1
                (joblib)      SQLAlchemy         (background)
 ```
 
-Postgres is a roadmap item — the running stack defaults to SQLite.
+Postgres is a roadmap item - the running stack defaults to SQLite.
 
 ---
 
@@ -48,8 +48,8 @@ streamlit run frontend/app.py
 
 - API docs: http://127.0.0.1:8000/docs  
 - Dashboard: http://127.0.0.1:8501  
-- Sample upload file: `data/sample_upload.csv` (**48 held-out texts** — use this in the UI)
-- Training labels live in `data/complaints.csv` (**240 rows**, 60×4) — for `python -m ml.train` only, not for demo upload
+- Sample upload file: `data/sample_upload.csv` (**48 held-out texts** - use this in the UI)
+- Training labels live in `data/complaints.csv` (**240 rows**, 60×4) - for `python -m ml.train` only, not for demo upload
 - If the dashboard shows junk / 100% review from old runs: stop API → `python scripts/reset_local_db.py` → restart → upload `sample_upload.csv`
 
 ### Sample workflow
@@ -112,7 +112,7 @@ Important flags:
 |----------|---------|
 | `AUTH_ENABLED` | Require `X-API-Key` on `/api/v1/*` |
 | `API_KEY` | Required when auth is enabled (fail-fast if missing) |
-| `REQUIRE_AUTH_IN_PRODUCTION` | Defaults **true** — `ENVIRONMENT=production\|staging` must enable auth (opt out only for demos) |
+| `REQUIRE_AUTH_IN_PRODUCTION` | Defaults **true** - `ENVIRONMENT=production\|staging` must enable auth (opt out only for demos) |
 | `CONFIDENCE_THRESHOLD` | Below this → `needs_review` (default `0.38`; 4-class max-prob rarely exceeds ~0.55) |
 
 See `.env.example` for `DATABASE_URL`, upload limits, CORS, page sizes, and frontend `API_BASE_URL`.
@@ -141,7 +141,7 @@ $env:API_KEY="replace-me"
 docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build
 ```
 
-- Frontend uses `API_BASE_URL=http://api:8000` (Compose DNS — not localhost).
+- Frontend uses `API_BASE_URL=http://api:8000` (Compose DNS - not localhost).
 - ML model is **baked into the image** at build time. Do not mount an empty
   host `ml/artifacts` over it (that previously wiped the model on fresh clones).
 - SQLite DB + uploads persist in the named volume `insightai_data`.
@@ -187,7 +187,7 @@ via `python -m ml.train`).
 
 - In-process background jobs (not a durable worker queue)
 - SQLite by default (Postgres on the roadmap)
-- Small synthetic dataset — do not treat metrics as customer-data performance
+- Small synthetic dataset - do not treat metrics as customer-data performance
 - Re-uploading the **exact same file bytes** returns the existing job (content-hash idempotency). A changed file creates a new job.
 - Startup reclaim marks abandoned `processing` jobs as `failed` after a crash/restart.
 - Job API never exposes server filesystem paths; use `can_retry` to know if retry is possible.

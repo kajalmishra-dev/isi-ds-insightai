@@ -49,7 +49,7 @@ class Settings:
         self.environment = os.getenv("ENVIRONMENT", "development")
 
         self.database_url = os.getenv("DATABASE_URL", "sqlite:///./insight.db")
-        self.confidence_threshold = _env_float("CONFIDENCE_THRESHOLD", "0.38")
+        self.confidence_threshold = _env_float("CONFIDENCE_THRESHOLD", "0.32")
         if not 0.0 <= self.confidence_threshold <= 1.0:
             raise ValueError("CONFIDENCE_THRESHOLD must be between 0 and 1")
 

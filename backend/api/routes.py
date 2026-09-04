@@ -392,6 +392,7 @@ def review_complaint(
 
     row.category = category
     row.needs_review = False
+    row.human_reviewed = True
     db.commit()
     db.refresh(row)
     return row

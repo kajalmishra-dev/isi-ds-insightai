@@ -43,6 +43,14 @@ def ensure_schema() -> None:
                         "WHERE lower(coalesce(category, '')) = 'needs_review'"
                     )
                 )
+            if "human_reviewed" not in columns:
+                logger.info("Adding complaints.human_reviewed column")
+                conn.execute(
+                    text(
+                        "ALTER TABLE complaints ADD COLUMN human_reviewed BOOLEAN "
+                        "NOT NULL DEFAULT 0"
+                    )
+                )
 
         if "ingestion_jobs" in tables:
             job_cols = {

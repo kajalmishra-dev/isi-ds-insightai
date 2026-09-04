@@ -59,7 +59,7 @@ def inject_styles() -> None:
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Hide Streamlit chrome — display:none avoids sticky blur over hero */
+        /* Hide Streamlit chrome - display:none avoids sticky blur over hero */
         #MainMenu, footer { visibility: hidden; height: 0; }
         header[data-testid="stHeader"],
         [data-testid="stHeader"],
@@ -104,7 +104,7 @@ def inject_styles() -> None:
             margin: 1.75rem 0 0.85rem !important;
         }
 
-        /* Hero — brand first, airy */
+        /* Hero - brand first, airy */
         .hero {
             margin: 0 0 1.75rem;
             padding: 0;
@@ -142,7 +142,7 @@ def inject_styles() -> None:
             margin: 1.15rem 0 0.45rem;
         }
 
-        /* KPI strip — Apple metrics */
+        /* KPI strip - Apple metrics */
         .kpi-row {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -349,6 +349,160 @@ def inject_styles() -> None:
             margin-top: 0.75rem;
         }
 
+        /* Live Classification - align result card with textarea label */
+        .live-field-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--ink) !important;
+            margin: 0 0 0.35rem;
+            line-height: 1.4;
+            min-height: 1.25rem;
+        }
+
+        .live-sample-label {
+            font-size: 0.8rem;
+            color: var(--muted) !important;
+            margin: 0.35rem 0 0.45rem;
+        }
+
+        .prediction-card {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 1.25rem 1.35rem;
+        }
+
+        .prediction-card .pred-kicker {
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--faint) !important;
+            margin: 0 0 0.55rem;
+        }
+
+        .prediction-card .pred-badge {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.45rem;
+            margin: 0 0 0.35rem;
+        }
+
+        .prediction-card .pred-badge .tag {
+            font-size: 1.15rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            padding: 0.35rem 0.85rem;
+            border-radius: 980px;
+            background: #e8f1ff;
+            color: #1d4ed8 !important;
+        }
+
+        .prediction-card .pred-badge .tag.review {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            padding: 0.22rem 0.55rem;
+            background: #fff6e5;
+            color: #9a6700 !important;
+        }
+
+        .prediction-card .pred-conf {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            margin: 1rem 0 0.4rem;
+        }
+
+        .prediction-card .pred-conf .pct {
+            font-size: 1.55rem;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            color: var(--ink) !important;
+        }
+
+        .prediction-card .pred-conf .hint {
+            font-size: 0.8rem;
+            color: var(--muted) !important;
+        }
+
+        .prediction-card .pred-bar {
+            height: 0.55rem;
+            width: 100%;
+            background: #ececef;
+            border-radius: 980px;
+            overflow: hidden;
+            margin-bottom: 1.1rem;
+        }
+
+        .prediction-card .pred-bar > span {
+            display: block;
+            height: 100%;
+            background: var(--accent);
+            border-radius: 980px;
+        }
+
+        .prediction-card .pred-alts-title {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--muted) !important;
+            margin: 0 0 0.55rem;
+        }
+
+        .prediction-card .alt-row {
+            display: grid;
+            grid-template-columns: 5.5rem 1fr 3.2rem;
+            gap: 0.55rem;
+            align-items: center;
+            margin: 0.35rem 0;
+            font-size: 0.85rem;
+            color: var(--ink) !important;
+        }
+
+        .prediction-card .alt-row .alt-bar {
+            height: 0.4rem;
+            background: #ececef;
+            border-radius: 980px;
+            overflow: hidden;
+        }
+
+        .prediction-card .alt-row .alt-bar > span {
+            display: block;
+            height: 100%;
+            background: #a1a1a6;
+            border-radius: 980px;
+        }
+
+        .prediction-card .alt-row .alt-pct {
+            text-align: right;
+            color: var(--muted) !important;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .prediction-card .pred-model {
+            margin-top: 0.9rem;
+            font-size: 0.78rem;
+            color: var(--faint) !important;
+        }
+
+        /* Sample chips (st.pills) - nowrap + accent hover */
+        [data-testid="stPills"] button,
+        [data-testid="stButtonGroup"] button {
+            white-space: nowrap !important;
+            cursor: pointer !important;
+            transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+        }
+
+        [data-testid="stPills"] button:hover,
+        [data-testid="stButtonGroup"] button:hover {
+            border-color: var(--accent) !important;
+            color: var(--accent) !important;
+            background: #f0f7ff !important;
+        }
+
         .pager {
             display: flex;
             align-items: center;
@@ -438,7 +592,7 @@ def inject_styles() -> None:
             margin-top: 0.75rem;
         }
 
-        /* Sidebar — soft Apple settings */
+        /* Sidebar - soft Apple settings */
         section[data-testid="stSidebar"] {
             background: #fbfbfd !important;
             border-right: 1px solid var(--line) !important;
@@ -807,25 +961,25 @@ def format_confidence(value: Any) -> str:
     try:
         return f"{float(value) * 100:.1f}%"
     except (TypeError, ValueError):
-        return "—"
+        return "-"
 
 
 def format_when(value: Any) -> str:
     if value is None or (isinstance(value, float) and pd.isna(value)):
-        return "—"
+        return "-"
     ts = pd.to_datetime(value, errors="coerce")
     if pd.isna(ts):
-        return "—"
+        return "-"
     # Compact: year is implied for current ops data
     return ts.strftime("%b %d, %I:%M %p")
 
 
 def format_job_id(value: Any) -> str:
     if value is None or (isinstance(value, float) and pd.isna(value)):
-        return "—"
+        return "-"
     text = str(value).strip()
     if text in {"", "None", "nan", "NaT"}:
-        return "—"
+        return "-"
     return text[:8]
 
 
@@ -944,7 +1098,7 @@ def render_job_panel() -> None:
             try:
                 quality = json.loads(quality_raw)
                 st.caption(
-                    "Data quality — "
+                    "Data quality - "
                     f"missing text: {quality.get('missing_text', 0)}, "
                     f"invalid timestamps: {quality.get('invalid_timestamps', 0)}, "
                     f"duplicates: {quality.get('duplicate_rows', 0)}, "
@@ -986,7 +1140,7 @@ def render_overview(data: dict[str, Any]) -> None:
             ),
             render_kpi(
                 "Median Resolution",
-                f"{med:.1f}h" if med is not None else "—",
+                f"{med:.1f}h" if med is not None else "-",
                 f"Avg {avg_hours:.1f}h" if avg_hours is not None else "Resolution time",
             ),
         ]
@@ -1025,7 +1179,7 @@ def render_overview(data: dict[str, Any]) -> None:
                 lambda label: counts_by_label.get(label, 0)
             )
             cat_df["Axis"] = [
-                f"{label} ({count}) — {pct:.1f}%"
+                f"{label} ({count}) - {pct:.1f}%"
                 for label, count, pct in zip(
                     cat_df["Category"], cat_df["Count"], cat_df["Percentage"]
                 )
@@ -1145,7 +1299,7 @@ def render_review_queue(data: dict[str, Any]) -> None:
     st.markdown(
         f"""
         <div class="review-banner">
-            <strong>{count} pending review</strong> — click a table row to triage on the right.
+            <strong>{count} pending review</strong> - click a table row to triage on the right.
         </div>
         """,
         unsafe_allow_html=True,
@@ -1413,7 +1567,7 @@ def render_explorer(data: dict[str, Any]) -> None:
     if "resolved_at" in view.columns:
         view["resolved_at"] = view["resolved_at"].map(format_when)
 
-    # job_id intentionally omitted — noise in the grid; available via API/export
+    # job_id intentionally omitted - noise in the grid; available via API/export
     show_cols = [
         c
         for c in ["text", "category_label", "confidence", "created_at", "resolved_at"]
@@ -1459,6 +1613,53 @@ def render_explorer(data: dict[str, Any]) -> None:
             st.rerun()
 
 
+def render_prediction_card(body: dict[str, Any]) -> None:
+    label = label_category(body.get("category"))
+    conf = float(body.get("confidence") or 0)
+    conf_pct = conf * 100
+    needs_review = bool(body.get("needs_review"))
+    review_tag = (
+        '<span class="tag review">Needs review</span>' if needs_review else ""
+    )
+    alts = body.get("alternatives") or []
+    alt_rows = []
+    for alt in alts[:3]:
+        alt_label = label_category(alt.get("category"))
+        alt_conf = float(alt.get("confidence") or 0) * 100
+        alt_rows.append(
+            f'<div class="alt-row">'
+            f"<span>{html.escape(alt_label)}</span>"
+            f'<div class="alt-bar"><span style="width:{min(100.0, alt_conf):.1f}%"></span></div>'
+            f'<span class="alt-pct">{alt_conf:.1f}%</span>'
+            f"</div>"
+        )
+    alts_html = (
+        f'<div class="pred-alts-title">Also considering</div>{"".join(alt_rows)}'
+        if alt_rows
+        else ""
+    )
+    model = html.escape(str(body.get("model_version") or "unknown"))
+    st.markdown(
+        f"""
+        <div class="prediction-card">
+            <div class="pred-kicker">Primary category</div>
+            <div class="pred-badge">
+                <span class="tag">{html.escape(label)}</span>
+                {review_tag}
+            </div>
+            <div class="pred-conf">
+                <span class="pct">{conf_pct:.1f}%</span>
+                <span class="hint">model confidence</span>
+            </div>
+            <div class="pred-bar"><span style="width:{min(100.0, conf_pct):.1f}%"></span></div>
+            {alts_html}
+            <div class="pred-model">Model · {model}</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
 def render_live_classify() -> None:
     samples = {
         "Billing error": "I was charged twice for the same subscription invoice.",
@@ -1466,26 +1667,71 @@ def render_live_classify() -> None:
         "Account locked": "I cannot reset my password and the OTP never arrives.",
         "App crash": "The mobile app freezes right after the latest update.",
     }
+
+    st.caption("Predictions show model confidence, not absolute certainty.")
     left, right = st.columns([1.1, 1], gap="large")
+    run = False
+
     with left:
-        st.caption("Predictions show model confidence, not absolute certainty.")
         st.text_area(
             "Complaint text",
             height=140,
             placeholder="Describe the issue…",
             key="live_classify_text",
+            label_visibility="visible",
         )
-        chips = st.columns(len(samples))
-        for col, (label, text) in zip(chips, samples.items()):
-            with col:
-                if st.button(label, use_container_width=True):
-                    st.session_state.live_classify_text = text
-                    st.rerun()
-        run = st.button("Classify", type="primary", use_container_width=True)
+        st.markdown(
+            '<p class="live-sample-label">Try a sample</p>',
+            unsafe_allow_html=True,
+        )
+        sample_row, classify_row = st.columns([4.2, 1], gap="small")
+        with sample_row:
+            picked = st.pills(
+                "Samples",
+                options=list(samples.keys()),
+                selection_mode="single",
+                key="live_sample_pills",
+                label_visibility="collapsed",
+            )
+            if picked and st.session_state.get("live_sample_applied") != picked:
+                st.session_state.live_classify_text = samples[picked]
+                st.session_state.live_sample_applied = picked
+                st.session_state.pop("live_prediction", None)
+                st.rerun()
+        with classify_row:
+            st.markdown('<div style="height:0.15rem"></div>', unsafe_allow_html=True)
+            run = st.button("Classify", type="primary", use_container_width=True)
+
+    text = str(st.session_state.get("live_classify_text", "")).strip()
 
     with right:
-        text = str(st.session_state.get("live_classify_text", "")).strip()
-        if not run or not text:
+        st.markdown(
+            '<p class="live-field-label">Prediction</p>',
+            unsafe_allow_html=True,
+        )
+        if run:
+            if not text:
+                st.session_state.live_prediction = None
+                st.warning("Enter complaint text or pick a sample first.")
+            else:
+                with st.spinner("Classifying…"):
+                    try:
+                        pred = api_post("/predict", json={"text": text})
+                    except requests.RequestException as exc:
+                        st.session_state.live_prediction = None
+                        st.error(f"Classification request failed: {exc}")
+                        pred = None
+                if pred is not None:
+                    if pred.status_code == 200:
+                        st.session_state.live_prediction = pred.json()
+                    else:
+                        st.session_state.live_prediction = None
+                        st.error(friendly_http_error("Classification failed", pred))
+
+        result = st.session_state.get("live_prediction")
+        if result:
+            render_prediction_card(result)
+        else:
             st.markdown(
                 """
                 <div class="skeleton-card">
@@ -1497,32 +1743,6 @@ def render_live_classify() -> None:
                 """,
                 unsafe_allow_html=True,
             )
-            return
-        with st.spinner("Classifying…"):
-            try:
-                pred = api_post("/predict", json={"text": text})
-            except requests.RequestException as exc:
-                st.error(f"Classification request failed: {exc}")
-                return
-
-        if pred.status_code != 200:
-            st.error(friendly_http_error("Classification failed", pred))
-            return
-
-        body = pred.json()
-        label = label_category(body["category"])
-        if body.get("needs_review"):
-            st.warning(f"**{label}** — flagged for human review")
-        else:
-            st.success(f"**{label}**")
-        st.metric("Confidence", format_confidence(body.get("confidence")))
-        st.caption(f"Model `{body.get('model_version', 'unknown')}`")
-        alts = body.get("alternatives") or []
-        if alts:
-            st.caption(
-                "Alternatives: "
-                + ", ".join(f"{a['category']} {a['confidence']:.0%}" for a in alts[:3])
-            )
 
 
 # --- App ---
@@ -1533,7 +1753,7 @@ st.markdown(
     """
     <div class="hero">
         <p class="brand">Insight<span>AI</span></p>
-        <p class="tagline">Complaint intelligence — classify, review, and track resolution SLAs.</p>
+        <p class="tagline">Complaint intelligence - classify, review, and track resolution SLAs.</p>
     </div>
     """,
     unsafe_allow_html=True,
@@ -1607,7 +1827,7 @@ with st.sidebar:
                         payload = res.json()
                         st.session_state.active_job_id = payload.get("job_id")
                         if payload.get("deduplicated"):
-                            st.info("Identical file already processed — opened existing job.")
+                            st.info("Identical file already processed - opened existing job.")
                         else:
                             st.success("Ingestion started")
                         st.rerun()

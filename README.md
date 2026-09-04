@@ -1,259 +1,198 @@
-# 📊 InsightAI — AI Complaint Intelligence System
+# InsightAI — Complaint Intelligence Platform
 
-> End-to-end ML-powered system for complaint classification, storage, and analytics with a real-world business metric.
+Production-style system for complaint ingestion, ML classification, review queues, SLA analytics, export, and job retry.
 
----
-
-## What This Project Does
-
-InsightAI ingests raw complaint data via CSV, classifies each complaint using an ML model, stores results in a database, and generates actionable analytics through an interactive dashboard.
-
-It is designed as a **production-style pipeline** combining:
-
-* FastAPI (backend)
-* Streamlit (frontend)
-* ML inference (scikit-learn)
-* Background processing
+**Version:** 2.1 · FastAPI + Streamlit + scikit-learn + SQLAlchemy
 
 ---
 
-## Key Features
+## What you get
 
-* 📁 **CSV Upload Pipeline**
-
-  * Upload complaint data via UI
-  * Processed asynchronously in background
-
-* 🤖 **ML Classification**
-
-  * TF-IDF + Logistic Regression
-  * Confidence-based predictions
-  * Low confidence → `needs_review`
-
-* 🗄️ **Database Storage**
-
-  * SQLAlchemy ORM
-  * SQLite by default (`DATABASE_URL` configurable)
-
-* 📊 **Analytics Dashboard**
-
-  * Category distribution (%)
-  * Top issues
-  * Drill-down filtering
-  * Recent complaints view
-
-* ⚡ **North Star Metric**
-
-  * % of complaints resolved within **24 hours**
+- CSV upload with **async job tracking** (progress, processed/skipped/error counts, data-quality summary)
+- **Content-hash idempotency** (identical uploads reuse the existing job)
+- **Retry** for failed jobs when the source file is still available
+- ML classification with **confidence threshold → Needs Review**
+- Analytics KPIs + **computed insights** (never hardcoded fake observations)
+- Complaint explorer with search/sort/filters + **CSV export**
+- Live classify with `model_version` + alternative scores
+- Optional **API key auth**, CORS, request IDs, response timing, readiness probes
+- Docker Compose deployment with persisted DB/uploads volume
 
 ---
 
-## System Architecture
+## Architecture
 
 ```
-Streamlit UI
-    ↓ HTTP
-FastAPI Backend
-    ↓
- ┌───────────────┬───────────────┬───────────────┐
- │               │               │               │
-ML Engine     Database        Analytics     Background Task
-(engine.py)   (SQLAlchemy)    (services)    (CSV ingestion)
+Streamlit dashboard  ──HTTP──►  FastAPI /api/v1
+                                  │
+                    ┌─────────────┼──────────────┐
+                    ▼             ▼              ▼
+               ML engine     SQLite (default)   Ingestion jobs
+               (joblib)      SQLAlchemy         (background)
 ```
+
+Postgres is a roadmap item — the running stack defaults to SQLite.
 
 ---
 
-## Data Flow
-
-1. User uploads CSV via Streamlit
-2. FastAPI saves file
-3. Background task:
-
-   * Reads CSV using Pandas
-   * Runs ML predictions
-   * Applies confidence threshold
-   * Stores in DB
-4. Analytics API computes:
-
-   * category distribution
-   * resolution metrics
-5. Streamlit displays dashboard
-
----
-
-## ML Pipeline
-
-* **Vectorizer:** TF-IDF (1–2 grams)
-* **Model:** Logistic Regression
-* **Handling Imbalance:** `class_weight="balanced"`
-
-**Prediction Output:**
-
-```json
-{
-  "category": "payment",
-  "confidence": 0.82
-}
-```
-
-**Business Rule:**
-
-* confidence < 0.6 → `needs_review`
-
----
-
-## Metrics
-
-### North Star Metric
-
-> % of complaints resolved within 24 hours
-
-```
-(resolved within 24h / total complaints) * 100
-```
-
-### Other Metrics
-
-* Category distribution (%)
-* Top 3 issues
-* Recent complaints
-
----
-
-## 📁 Project Structure
-
-```
-insightai/
-
-├── backend/
-│   ├── main.py                  # FastAPI entrypoint
-│   ├── api/routes.py            # Upload + analytics endpoints
-│   ├── core/
-│   │   ├── database.py          # DB config
-│   │   └── deps.py              # DB dependency
-│   ├── models/complaint.py      # ORM model
-│   ├── schemas/complaint.py     # Response schemas
-│   └── services/analytics.py    # Analytics logic
-│
-├── frontend/
-│   └── app.py                   # Streamlit dashboard
-│
-├── ml/
-│   ├── engine.py                # Model loading + prediction
-│   ├── train.py                 # Training script
-│   └── artifacts/model.joblib   # Saved model
-│
-├── data/                        # Uploaded CSVs
-├── insight.db                   # SQLite database
-└── README.md
-```
-
----
-
-## API Endpoints
-
-| Method | Endpoint             | Description                   |
-| ------ | -------------------- | ----------------------------- |
-| POST   | `/upload`            | Upload CSV (async processing) |
-| GET    | `/analytics/summary` | Aggregated insights           |
-| GET    | `/complaints`        | Latest complaints             |
-| GET    | `/health`            | Health check                  |
-
----
-
-## Setup Instructions
-
-### 1. Install dependencies
+## Quick start
 
 ```bash
-pip install -r requirements.txt
-```
-
----
-
-### 2. Train model
-
-```bash
+pip install -r requirements-dev.txt
+python scripts/generate_training_data.py
 python -m ml.train
-```
-
----
-
-### 3. Run backend
-
-```bash
 uvicorn backend.main:app --reload
-```
-
----
-
-### 4. Run frontend
-
-```bash
+# other terminal
 streamlit run frontend/app.py
 ```
 
+- API docs: http://127.0.0.1:8000/docs  
+- Dashboard: http://127.0.0.1:8501  
+- Sample upload file: `data/sample_upload.csv` (held-out texts)
+
+### Sample workflow
+
+1. Open the dashboard and confirm **API ready**
+2. Upload `data/sample_upload.csv`
+3. Watch job progress (processed / skipped / errors)
+4. Review KPIs, AI insights, and the **Review Queue**
+5. Export a job CSV or filtered complaints CSV
+6. Try live classification on a single complaint
+
 ---
 
-### 5. Open dashboard
+## API (v1)
 
-```
-http://localhost:8501
-```
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/health` | Liveness |
+| GET | `/ready` | DB + model readiness (+ `model_version`) |
+| POST | `/api/v1/upload` | Accept CSV → `job_id` (`202`, or `200` if identical content already ingested) |
+| GET | `/api/v1/jobs/{id}` | Job status |
+| GET | `/api/v1/jobs` | Recent jobs |
+| POST | `/api/v1/jobs/{id}/retry` | Retry a **failed** job |
+| GET | `/api/v1/jobs/{id}/export.csv` | Download classified rows for a job |
+| GET | `/api/v1/analytics/summary` | KPIs + computed insights |
+| GET | `/api/v1/complaints` | Paginated list (`page`, `page_size`, `category`, `search`, `sort_by`, `sort_order`, `date_from`, `date_to`, `needs_review`, confidence bounds) |
+| GET | `/api/v1/complaints/export.csv` | Download filtered complaints |
+| POST | `/api/v1/predict` | Classify one text |
 
----
+Legacy flat paths (`/upload`, `/complaints`, …) still work for compatibility.
 
-## Input Requirements
+Response headers include `X-Request-ID` and `X-Response-Time-Ms`.
 
-### Upload CSV
-
-Must contain:
+### Upload CSV columns
 
 ```
 text, created_at, resolved_at
 ```
 
-### Training CSV
+### Auth
 
-Must contain:
+```bash
+# .env
+AUTH_ENABLED=true
+API_KEY=replace-with-a-long-secret
+```
+
+Send header: `X-API-Key: <key>`
+
+---
+
+## Configuration
+
+Copy `.env.example` to `.env`. The API loads it automatically via `python-dotenv`
+(process environment variables still win if already set).
+
+Important flags:
+
+| Variable | Purpose |
+|----------|---------|
+| `AUTH_ENABLED` | Require `X-API-Key` on `/api/v1/*` |
+| `API_KEY` | Required when auth is enabled (fail-fast if missing) |
+| `REQUIRE_AUTH_IN_PRODUCTION` | Defaults **true** — `ENVIRONMENT=production\|staging` must enable auth (opt out only for demos) |
+| `CONFIDENCE_THRESHOLD` | Below this → `needs_review` (default `0.6`) |
+
+See `.env.example` for `DATABASE_URL`, upload limits, CORS, page sizes, and frontend `API_BASE_URL`.
+
+---
+
+## Tests
+
+```bash
+pytest tests/ -v
+```
+
+---
+
+## Docker
+
+```bash
+docker compose up --build
+```
+
+Shared / staging (auth required):
+
+```bash
+# Windows PowerShell
+$env:API_KEY="replace-me"
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build
+```
+
+- Frontend uses `API_BASE_URL=http://api:8000` (Compose DNS — not localhost).
+- ML model is **baked into the image** at build time. Do not mount an empty
+  host `ml/artifacts` over it (that previously wiped the model on fresh clones).
+- SQLite DB + uploads persist in the named volume `insightai_data`.
+- Compose defaults to `ENVIRONMENT=development` with auth off for local demos.
+  Production overlay sets `AUTH_ENABLED=true` and requires `API_KEY`.
+
+---
+
+## Project layout
 
 ```
-text, category
+backend/     FastAPI app, auth, jobs, analytics, export
+frontend/    Streamlit operations dashboard
+ml/          Training, experiments, inference
+data/        Training + held-out sample upload CSVs
+scripts/     Data generation helpers
+tests/       API / ML / product contract tests
 ```
 
 ---
 
-## Engineering Highlights
+## ML pipeline
 
-* Clean separation: API / ML / Services / DB
-* Background processing using FastAPI tasks
-* Confidence-aware ML decisions
-* Stateful UI using Streamlit session
-* Real business metric design (North Star)
+Classifier is selected by measured holdout comparison (`python -m ml.experiments`
+via `python -m ml.train`).
 
----
-
-## Future Improvements
-
-* Replace ML with BERT / LLM
-* Add authentication (JWT)
-* Pagination + filtering in backend
-* Docker + cloud deployment
-* Real-time streaming (Kafka/WebSockets)
+- Training data is **synthetic / hand-authored** (`scripts/generate_training_data.py`).
+- Demo upload file `data/sample_upload.csv` is a **held-out** text set (zero overlap with training texts).
+- Candidate comparison is written to `ml/artifacts/experiments.json`.
+- Holdout metrics for the winner are in `ml/artifacts/evaluation.json`.
+- Selection rule: highest **macro F1**, then weighted F1, then accuracy.
+- We only claim improvement when those measured metrics beat the baseline.
+- Predictions below `CONFIDENCE_THRESHOLD` (default `0.6`) set `needs_review=true`
+  while keeping the model’s predicted `category` (so charts stay meaningful).
+- Reviewers can clear the queue with `POST /api/v1/complaints/{id}/review`.
+- API responses expose `model_version` and optional alternative class scores. Model confidence is the max class probability and may be poorly calibrated.
 
 ---
 
-## What This Proves
+## Known limitations
 
-* You can build production-style ML systems
-* You understand backend + ML integration
-* You think in terms of metrics, not just models
-* You can design scalable pipelines
-
----
-
-## Author
-
-Built as part of full-stack ISI internship.
+- In-process background jobs (not a durable worker queue)
+- SQLite by default (Postgres on the roadmap)
+- Small synthetic dataset — do not treat metrics as customer-data performance
+- Re-uploading the **exact same file bytes** returns the existing job (content-hash idempotency). A changed file creates a new job.
+- Startup reclaim marks abandoned `processing` jobs as `failed` after a crash/restart.
+- Job API never exposes server filesystem paths; use `can_retry` to know if retry is possible.
 
 ---
+
+## Roadmap
+
+- Swap classical ML for transformer/LLM classifiers behind the same API
+- Postgres + Alembic migrations for multi-instance deploys
+- Object storage for uploads + worker queue (RQ/Celery)
+- Role-based access (viewer / analyst / admin)

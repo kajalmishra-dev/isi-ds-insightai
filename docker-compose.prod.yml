@@ -1,0 +1,13 @@
+# Shared / staging profile. Requires API_KEY in the environment:
+#   set API_KEY=your-secret && docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build
+services:
+  api:
+    environment:
+      ENVIRONMENT: production
+      AUTH_ENABLED: "true"
+      REQUIRE_AUTH_IN_PRODUCTION: "true"
+      API_KEY: ${API_KEY:?Set API_KEY before starting the production profile}
+
+  frontend:
+    environment:
+      API_KEY: ${API_KEY:?Set API_KEY before starting the production profile}

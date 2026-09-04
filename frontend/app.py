@@ -6,10 +6,12 @@ import html
 import json
 import os
 import time
+from pathlib import Path
 from typing import Any
 
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 import requests
 import streamlit as st
 
@@ -26,6 +28,18 @@ REQUEST_TIMEOUT = float(os.getenv("API_TIMEOUT_SECONDS", "20"))
 CATEGORY_LABELS = {"needs_review": "Needs Review"}
 TRIAGE_CATEGORIES = ("billing", "technical", "shipping", "service")
 SECTIONS = ("Overview", "Review Queue", "Complaint Explorer", "Live Classification")
+CATEGORY_COLORS = {
+    "Billing": "#0071e3",
+    "Shipping": "#34c759",
+    "Service": "#ff9f0a",
+    "Technical": "#af52de",
+    "Needs Review": "#ff3b30",
+    "Unknown": "#8e8e93",
+}
+CHART_FALLBACK_COLORS = ["#0071e3", "#34c759", "#ff9f0a", "#af52de", "#5ac8fa", "#ff375f"]
+REPO_ROOT = Path(__file__).resolve().parents[1]
+SAMPLE_CSV_PATH = REPO_ROOT / "data" / "sample_upload.csv"
+FEATURE_GUIDE_PATH = REPO_ROOT / "docs" / "InsightAI_Feature_Guide.pdf"
 
 
 def inject_styles() -> None:
@@ -779,6 +793,14 @@ def inject_styles() -> None:
             font-size: 0.88rem !important;
         }
 
+        div[data-testid="stDataFrame"] [data-testid="stElementToolbar"],
+        div[data-testid="stDataFrame"] [data-testid="stElementToolbarButton"],
+        [data-testid="stElementToolbar"] {
+            display: none !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
+
         /* Selected review-queue row (glide selection + styler fallback) */
         div[data-testid="stDataFrame"] [aria-selected="true"],
         div[data-testid="stDataFrame"] [role="gridcell"][aria-selected="true"] {
@@ -1147,9 +1169,35 @@ def render_overview(data: dict[str, Any]) -> None:
     )
     st.markdown(f'<div class="kpi-row">{kpis}</div>', unsafe_allow_html=True)
 
+    review_n = int(data.get("needs_review_count") or 0)
+    reviewed_n = int(data.get("human_reviewed_count") or 0)
+    if review_n > 0:
+        go_col, feedback_col = st.columns([1.2, 1])
+        with go_col:
+            if st.button(
+                f"Triage {review_n} pending reviews →",
+                type="primary",
+                use_container_width=True,
+                key="goto_review_queue",
+            ):
+                st.session_state.section = "Review Queue"
+                st.rerun()
+        with feedback_col:
+            if reviewed_n:
+                st.caption(f"{reviewed_n} complaints human-reviewed (feedback for retraining)")
+    elif reviewed_n:
+        st.success(f"Queue clear - {reviewed_n} complaints human-reviewed. Nice work.")
+
     render_system_alerts(data.get("insights") or [])
 
-    left, right = st.columns([1.5, 1], gap="large")
+    if int(data.get("total_complaints") or 0) == 0:
+        empty_state(
+            "No complaints yet",
+            "Download the sample CSV from the sidebar, upload it, then explore Overview.",
+        )
+        return
+
+    left, right = st.columns([1.35, 1], gap="large")
     with left:
         st.markdown(
             '<div class="panel"><div class="panel-title">Category distribution</div>',
@@ -1167,7 +1215,6 @@ def render_overview(data: dict[str, Any]) -> None:
                 label_category(item["category"]): int(item["count"])
                 for item in (data.get("top_issues") or [])
             }
-            # Fill any categories missing from top_issues via percentage × total
             raw_dist = data.get("category_distribution") or {}
             for raw, pct in raw_dist.items():
                 label = label_category(raw)
@@ -1185,18 +1232,21 @@ def render_overview(data: dict[str, Any]) -> None:
                 )
             ]
             cat_df = cat_df.sort_values("Percentage", ascending=True)
+            color_map = {
+                label: CATEGORY_COLORS.get(
+                    label, CHART_FALLBACK_COLORS[i % len(CHART_FALLBACK_COLORS)]
+                )
+                for i, label in enumerate(cat_df["Category"])
+            }
             fig = px.bar(
                 cat_df,
                 x="Percentage",
                 y="Axis",
                 orientation="h",
-                color_discrete_sequence=["#0071e3"],
+                color="Category",
+                color_discrete_map=color_map,
             )
-            fig.update_traces(
-                textposition="outside",
-                marker_line_width=0,
-                width=0.55,
-            )
+            fig.update_traces(marker_line_width=0, width=0.62)
             fig.update_layout(
                 margin=dict(l=10, r=24, t=10, b=10),
                 xaxis_title="",
@@ -1219,6 +1269,41 @@ def render_overview(data: dict[str, Any]) -> None:
                 height=max(280, 64 * len(cat_df) + 80),
             )
             st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
+
+            # Donut mix for a stronger dashboard feel
+            pie = go.Figure(
+                data=[
+                    go.Pie(
+                        labels=cat_df["Category"],
+                        values=cat_df["Count"],
+                        hole=0.58,
+                        marker=dict(
+                            colors=[color_map[c] for c in cat_df["Category"]],
+                            line=dict(color="#ffffff", width=2),
+                        ),
+                        textinfo="label+percent",
+                        textposition="outside",
+                        hovertemplate="%{label}: %{value} (%{percent})<extra></extra>",
+                    )
+                ]
+            )
+            pie.update_layout(
+                margin=dict(l=10, r=10, t=8, b=8),
+                showlegend=False,
+                height=220,
+                paper_bgcolor="#ffffff",
+                font=dict(size=12, color="#1d1d1f"),
+                annotations=[
+                    dict(
+                        text=f"<b>{total}</b><br>total",
+                        x=0.5,
+                        y=0.5,
+                        font_size=14,
+                        showarrow=False,
+                    )
+                ],
+            )
+            st.plotly_chart(pie, use_container_width=True, config={"displayModeBar": False})
         st.markdown("</div>", unsafe_allow_html=True)
 
     with right:
@@ -1261,9 +1346,11 @@ def render_overview(data: dict[str, Any]) -> None:
                     ),
                 )
             selected_meta = next(j for j in jobs if str(j.get("id")) == selected_job)
-            actions = st.columns(2 if (
-                selected_meta.get("can_retry") or selected_meta.get("status") == "failed"
-            ) else 1)
+            actions = st.columns(
+                2
+                if (selected_meta.get("can_retry") or selected_meta.get("status") == "failed")
+                else 1
+            )
             with actions[0]:
                 try:
                     export_res = api_get(f"/jobs/{selected_job}/export.csv")
@@ -1294,6 +1381,8 @@ def render_overview(data: dict[str, Any]) -> None:
         st.markdown("</div>", unsafe_allow_html=True)
 
 
+
+
 def render_review_queue(data: dict[str, Any]) -> None:
     count = int(data.get("needs_review_count") or 0)
     st.markdown(
@@ -1307,7 +1396,19 @@ def render_review_queue(data: dict[str, Any]) -> None:
 
     review_df = st.session_state.review_data
     if review_df is None or review_df.empty:
-        empty_state("Review queue is empty", "No items need review right now.")
+        st.markdown(
+            """
+            <div class="empty-state">
+                <strong>Review queue clear</strong>
+                Nothing needs human triage right now. Head back to Overview for refreshed KPIs.
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        if st.button("Back to Overview", type="primary", key="review_to_overview"):
+            st.session_state.section = "Overview"
+            load_dashboard_data()
+            st.rerun()
         return
 
     if "review_selected_id" not in st.session_state:
@@ -1668,6 +1769,12 @@ def render_live_classify() -> None:
         "App crash": "The mobile app freezes right after the latest update.",
     }
 
+    # Apply sample text BEFORE the text_area widget is created (Streamlit rule).
+    pending = st.session_state.pop("live_sample_pending", None)
+    if pending is not None:
+        st.session_state.live_classify_text = pending
+        st.session_state.pop("live_prediction", None)
+
     st.caption("Predictions show model confidence, not absolute certainty.")
     left, right = st.columns([1.1, 1], gap="large")
     run = False
@@ -1694,9 +1801,8 @@ def render_live_classify() -> None:
                 label_visibility="collapsed",
             )
             if picked and st.session_state.get("live_sample_applied") != picked:
-                st.session_state.live_classify_text = samples[picked]
+                st.session_state.live_sample_pending = samples[picked]
                 st.session_state.live_sample_applied = picked
-                st.session_state.pop("live_prediction", None)
                 st.rerun()
         with classify_row:
             st.markdown('<div style="height:0.15rem"></div>', unsafe_allow_html=True)
@@ -1800,6 +1906,25 @@ with st.sidebar:
     st.markdown('<div class="sidebar-divider"></div>', unsafe_allow_html=True)
 
     st.markdown('<div class="section-label">Data</div>', unsafe_allow_html=True)
+    if SAMPLE_CSV_PATH.is_file():
+        st.download_button(
+            "Download sample CSV",
+            data=SAMPLE_CSV_PATH.read_bytes(),
+            file_name="insightai_sample_upload.csv",
+            mime="text/csv",
+            use_container_width=True,
+            help="48 held-out demo complaints. Upload this file to run the demo.",
+            key="dl_sample_csv",
+        )
+    if FEATURE_GUIDE_PATH.is_file():
+        st.download_button(
+            "Feature guide (PDF)",
+            data=FEATURE_GUIDE_PATH.read_bytes(),
+            file_name="InsightAI_Feature_Guide.pdf",
+            mime="application/pdf",
+            use_container_width=True,
+            key="dl_feature_guide",
+        )
     uploaded_file = st.file_uploader(
         "Upload CSV",
         type=["csv"],

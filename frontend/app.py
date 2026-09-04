@@ -59,13 +59,22 @@ def inject_styles() -> None:
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Hide Streamlit chrome */
-        #MainMenu, footer, header[data-testid="stHeader"] { visibility: hidden; height: 0; }
+        /* Hide Streamlit chrome — display:none avoids sticky blur over hero */
+        #MainMenu, footer { visibility: hidden; height: 0; }
+        header[data-testid="stHeader"],
+        [data-testid="stHeader"],
+        .stApp > header {
+            display: none !important;
+            height: 0 !important;
+            min-height: 0 !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
         [data-testid="stToolbar"] { display: none !important; }
         [data-testid="stDecoration"] { display: none !important; }
 
         .block-container {
-            padding: 2.25rem 2rem 3.5rem !important;
+            padding: 1.75rem 2rem 3.5rem !important;
             max-width: 1080px !important;
             color: var(--ink) !important;
         }
@@ -807,7 +816,8 @@ def format_when(value: Any) -> str:
     ts = pd.to_datetime(value, errors="coerce")
     if pd.isna(ts):
         return "—"
-    return ts.strftime("%b %d, %Y · %I:%M %p")
+    # Compact: year is implied for current ops data
+    return ts.strftime("%b %d, %I:%M %p")
 
 
 def format_job_id(value: Any) -> str:
@@ -1274,8 +1284,67 @@ def render_explorer(data: dict[str, Any]) -> None:
         label_category(c): c for c in (data.get("category_distribution") or {})
     }
 
-    st.caption("Filters update automatically · Export downloads the current filter set")
-    t1, t2, t3, t4, t5 = st.columns([2.2, 1.1, 1.1, 1.1, 1.0])
+    export_params = {
+        "search": saved.get("search"),
+        "category": saved.get("category"),
+        "needs_review": saved.get("needs_review"),
+    }
+    export_params = {k: v for k, v in export_params.items() if v not in (None, "")}
+
+    title_col, export_col = st.columns([3.2, 1], gap="medium")
+    with title_col:
+        st.markdown("### Complaint Explorer")
+        st.caption("Filters update automatically · Export uses the current filter set")
+    with export_col:
+        st.markdown('<div style="height:0.35rem"></div>', unsafe_allow_html=True)
+        try:
+            export_res = api_get("/complaints/export.csv", params=export_params or None)
+            if export_res.status_code == 200:
+                st.download_button(
+                    "Export CSV",
+                    data=export_res.content,
+                    file_name="insightai_complaints.csv",
+                    mime="text/csv",
+                    use_container_width=True,
+                    key="explorer_export_top",
+                )
+        except requests.RequestException:
+            st.caption("Export unavailable")
+
+    SORT_OPTIONS = [
+        ("created_at", "Sort: Created"),
+        ("confidence", "Sort: Confidence"),
+        ("category", "Sort: Category"),
+        ("id", "Sort: ID"),
+    ]
+    sort_values = [v for v, _ in SORT_OPTIONS]
+    sort_labels = dict(SORT_OPTIONS)
+
+    cat_values = ["(all)"] + sorted(
+        {label_category(c) for c in (data.get("category_distribution") or {})}
+    )
+    saved_cat = saved.get("category")
+    cat_label = label_category(saved_cat) if saved_cat else "(all)"
+    cat_index = cat_values.index(cat_label) if cat_label in cat_values else 0
+
+    review_values = ["(all)", "yes", "no"]
+    review_labels = {
+        "(all)": "Review: All",
+        "yes": "Review: Yes",
+        "no": "Review: No",
+    }
+    saved_review = saved.get("needs_review")
+    if saved_review is True:
+        review_default = "yes"
+    elif saved_review is False:
+        review_default = "no"
+    else:
+        review_default = "(all)"
+
+    sort_default = saved.get("sort_by", "created_at")
+    sort_index = sort_values.index(sort_default) if sort_default in sort_values else 0
+
+    t1, t2, t3, t4 = st.columns([2.4, 1.2, 1.15, 1.15], gap="small")
     with t1:
         search_q = st.text_input(
             "Search",
@@ -1284,41 +1353,27 @@ def render_explorer(data: dict[str, Any]) -> None:
             label_visibility="collapsed",
         )
     with t2:
-        category_options = ["(all)"] + sorted(
-            {label_category(c) for c in (data.get("category_distribution") or {})}
-        )
-        saved_cat = saved.get("category")
-        cat_label = label_category(saved_cat) if saved_cat else "(all)"
-        cat_index = category_options.index(cat_label) if cat_label in category_options else 0
         category_q = st.selectbox(
             "Category",
-            options=category_options,
+            options=cat_values,
             index=cat_index,
+            format_func=lambda v: "Category: All" if v == "(all)" else f"Category: {v}",
             label_visibility="collapsed",
         )
     with t3:
-        review_options = ["(all)", "yes", "no"]
-        saved_review = saved.get("needs_review")
-        if saved_review is True:
-            review_default = "yes"
-        elif saved_review is False:
-            review_default = "no"
-        else:
-            review_default = "(all)"
         review_q = st.selectbox(
             "Needs Review",
-            options=review_options,
-            index=review_options.index(review_default),
+            options=review_values,
+            index=review_values.index(review_default),
+            format_func=lambda v: review_labels[v],
             label_visibility="collapsed",
         )
     with t4:
-        sort_options = ["created_at", "confidence", "category", "id"]
-        sort_default = saved.get("sort_by", "created_at")
-        sort_index = sort_options.index(sort_default) if sort_default in sort_options else 0
         sort_q = st.selectbox(
             "Sort by",
-            options=sort_options,
+            options=sort_values,
             index=sort_index,
+            format_func=lambda v: sort_labels[v],
             label_visibility="collapsed",
         )
 
@@ -1342,26 +1397,6 @@ def render_explorer(data: dict[str, Any]) -> None:
         load_dashboard_data(_explorer_filters(page=1))
         st.rerun()
 
-    export_params = {
-        "search": current.get("search"),
-        "category": current.get("category"),
-        "needs_review": current.get("needs_review"),
-    }
-    export_params = {k: v for k, v in export_params.items() if v not in (None, "")}
-    with t5:
-        try:
-            export_res = api_get("/complaints/export.csv", params=export_params or None)
-            if export_res.status_code == 200:
-                st.download_button(
-                    "Export CSV",
-                    data=export_res.content,
-                    file_name="insightai_complaints.csv",
-                    mime="text/csv",
-                    use_container_width=True,
-                )
-        except requests.RequestException:
-            st.caption("Export unavailable")
-
     df = st.session_state.complaints_data
     meta = st.session_state.get("complaints_meta") or {}
     if df is None or df.empty:
@@ -1377,12 +1412,11 @@ def render_explorer(data: dict[str, Any]) -> None:
         view["created_at"] = view["created_at"].map(format_when)
     if "resolved_at" in view.columns:
         view["resolved_at"] = view["resolved_at"].map(format_when)
-    if "job_id" in view.columns:
-        view["job_id"] = view["job_id"].map(format_job_id)
 
+    # job_id intentionally omitted — noise in the grid; available via API/export
     show_cols = [
         c
-        for c in ["text", "category_label", "confidence", "created_at", "resolved_at", "job_id"]
+        for c in ["text", "category_label", "confidence", "created_at", "resolved_at"]
         if c in view.columns
     ]
     page = int(meta.get("page", 1) or 1)
@@ -1394,13 +1428,17 @@ def render_explorer(data: dict[str, Any]) -> None:
         use_container_width=True,
         hide_index=True,
         column_config={
+            "text": st.column_config.TextColumn("Complaint", width="large"),
+            "category": st.column_config.TextColumn("Category", width="medium"),
             "confidence": st.column_config.ProgressColumn(
                 "Confidence",
                 format="%.1f%%",
                 min_value=0,
                 max_value=100,
+                width="small",
             ),
-            "text": st.column_config.TextColumn("Complaint", width="large"),
+            "created_at": st.column_config.TextColumn("Created", width="medium"),
+            "resolved_at": st.column_config.TextColumn("Resolved", width="medium"),
         },
     )
 
@@ -1621,7 +1659,8 @@ if st.session_state.loading:
     st.info("Loading…")
 
 section = st.session_state.section
-st.markdown(f"### {section}")
+if section != "Complaint Explorer":
+    st.markdown(f"### {section}")
 
 if section == "Overview":
     render_overview(data)

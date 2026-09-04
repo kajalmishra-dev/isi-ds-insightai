@@ -52,6 +52,10 @@ class Settings:
         self.confidence_threshold = _env_float("CONFIDENCE_THRESHOLD", "0.32")
         if not 0.0 <= self.confidence_threshold <= 1.0:
             raise ValueError("CONFIDENCE_THRESHOLD must be between 0 and 1")
+        # Clear top-1 vs top-2 winners skip review even when max-prob is soft.
+        self.confidence_margin = _env_float("CONFIDENCE_MARGIN", "0.10")
+        if not 0.0 <= self.confidence_margin <= 1.0:
+            raise ValueError("CONFIDENCE_MARGIN must be between 0 and 1")
 
         self.upload_dir = os.getenv("UPLOAD_DIR", "data/uploads")
         self.max_upload_bytes = _env_int("MAX_UPLOAD_BYTES", str(10 * 1024 * 1024))
@@ -77,7 +81,7 @@ class Settings:
             import logging
 
             logging.getLogger(__name__).warning(
-                "ENVIRONMENT=%s with AUTH_ENABLED=false — API is open. "
+                "ENVIRONMENT=%s with AUTH_ENABLED=false - API is open. "
                 "Enable auth for any shared deploy.",
                 self.environment,
             )

@@ -115,7 +115,8 @@ Important flags:
 | `AUTH_ENABLED` | Require `X-API-Key` on `/api/v1/*` |
 | `API_KEY` | Required when auth is enabled (fail-fast if missing) |
 | `REQUIRE_AUTH_IN_PRODUCTION` | Defaults **true** - `ENVIRONMENT=production\|staging` must enable auth (opt out only for demos) |
-| `CONFIDENCE_THRESHOLD` | Below this → `needs_review` (default `0.38`; 4-class max-prob rarely exceeds ~0.55) |
+| `CONFIDENCE_THRESHOLD` | Soft max-prob cutoff for Needs Review (default `0.32`) |
+| `CONFIDENCE_MARGIN` | Clear winners (top1-top2 ≥ this) auto-accept even below threshold (default `0.10`) |
 
 See `.env.example` for `DATABASE_URL`, upload limits, CORS, page sizes, and frontend `API_BASE_URL`.
 
@@ -176,7 +177,7 @@ via `python -m ml.train`).
 - Holdout metrics for the winner are in `ml/artifacts/evaluation.json`.
 - Selection rule: highest **macro F1**, then weighted F1, then accuracy.
 - We only claim improvement when those measured metrics beat the baseline.
-- Predictions below `CONFIDENCE_THRESHOLD` (default `0.38`) set `needs_review=true`
+- Predictions below `CONFIDENCE_THRESHOLD` set `needs_review=true`, unless top-1 beats top-2 by `CONFIDENCE_MARGIN` (clear winner)
   while keeping the model’s predicted `category` (so charts stay meaningful).
 - Reviewers can clear the queue with `POST /api/v1/complaints/{id}/review`.
 - 4-class logistic regression max-probabilities are often soft (~0.3–0.5); that is expected,

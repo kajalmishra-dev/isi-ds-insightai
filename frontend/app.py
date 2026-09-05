@@ -72,19 +72,31 @@ def inject_styles() -> None:
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Hide Streamlit chrome - display:none avoids sticky blur over hero */
+        /* Soften Streamlit chrome but KEEP header shell so sidebar stays usable */
         #MainMenu, footer { visibility: hidden; height: 0; }
-        header[data-testid="stHeader"],
-        [data-testid="stHeader"],
-        .stApp > header {
-            display: none !important;
-            height: 0 !important;
-            min-height: 0 !important;
-            opacity: 0 !important;
-            pointer-events: none !important;
-        }
         [data-testid="stToolbar"] { display: none !important; }
         [data-testid="stDecoration"] { display: none !important; }
+        header[data-testid="stHeader"] {
+            background: transparent !important;
+            height: 2.75rem !important;
+            min-height: 2.75rem !important;
+            border-bottom: none !important;
+            box-shadow: none !important;
+        }
+        /* Force sidebar visible (hiding header completely used to collapse it) */
+        section[data-testid="stSidebar"] {
+            display: flex !important;
+            visibility: visible !important;
+            transform: none !important;
+            min-width: 16rem !important;
+            background: #fbfbfd !important;
+            border-right: 1px solid var(--line) !important;
+        }
+        div[data-testid="collapsedControl"],
+        div[data-testid="stSidebarCollapsedControl"] {
+            display: flex !important;
+            visibility: visible !important;
+        }
 
         .block-container {
             padding: 1.75rem 2rem 3.5rem !important;
@@ -533,35 +545,36 @@ def inject_styles() -> None:
             border: 1px solid var(--line);
             border-radius: var(--radius);
             box-shadow: var(--shadow);
-            padding: 1rem 1.15rem;
+            padding: 0.85rem 1.1rem 1rem;
             margin: 0 0 1rem;
         }
 
         .use-card .use-title {
-            font-size: 0.8rem;
+            font-size: 0.72rem;
             font-weight: 600;
-            letter-spacing: 0.04em;
+            letter-spacing: 0.06em;
             text-transform: uppercase;
             color: var(--faint) !important;
-            margin: 0 0 0.55rem;
+            margin: 0 0 0.65rem;
         }
 
         .use-grid {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
-            gap: 0.85rem 1.1rem;
+            gap: 0.75rem 1.25rem;
         }
 
         .use-grid h4 {
-            margin: 0 0 0.25rem !important;
-            font-size: 0.92rem !important;
+            margin: 0 0 0.2rem !important;
+            font-size: 0.88rem !important;
             font-weight: 600 !important;
+            letter-spacing: -0.01em !important;
             color: var(--ink) !important;
         }
 
         .use-grid p {
             margin: 0 !important;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             line-height: 1.4;
             color: var(--muted) !important;
         }
@@ -647,12 +660,7 @@ def inject_styles() -> None:
             margin-top: 0.75rem;
         }
 
-        /* Sidebar - soft Apple settings */
-        section[data-testid="stSidebar"] {
-            background: #fbfbfd !important;
-            border-right: 1px solid var(--line) !important;
-        }
-
+        /* Sidebar - soft Apple settings (base rules; visibility set above) */
         section[data-testid="stSidebar"] > div {
             background: #fbfbfd !important;
             padding-top: 1.25rem !important;
@@ -1182,22 +1190,6 @@ def render_job_panel() -> None:
 
 
 def render_overview(data: dict[str, Any]) -> None:
-    # Compact "why / who / data" strip - no blank lines (Streamlit HTML rule)
-    st.markdown(
-        '<div class="use-card"><div class="use-title">Why InsightAI</div>'
-        '<div class="use-grid">'
-        "<div><h4>Why use it</h4><p>Auto-sort complaint text into Billing, Shipping, "
-        "Service, or Technical. Humans only review uncertain rows. Track SLA and volume "
-        "without spreadsheets.</p></div>"
-        "<div><h4>Who it is for</h4><p>Support leads, operations analysts, and CX teams "
-        "that handle high volumes of written complaints and need a triage + reporting loop.</p></div>"
-        "<div><h4>Your own files</h4><p>Any CSV with columns <strong>text</strong>, "
-        "<strong>created_at</strong>, <strong>resolved_at</strong> works - not only the sample. "
-        "Download the sample for a safe demo format.</p></div>"
-        "</div></div>",
-        unsafe_allow_html=True,
-    )
-
     review_rate = float(data.get("low_confidence_rate") or 0)
     review_tone = "critical" if review_rate >= 80 else ("warn" if review_rate >= 40 else "")
     avg_hours = data.get("avg_resolution_hours")
@@ -1229,10 +1221,10 @@ def render_overview(data: dict[str, Any]) -> None:
     review_n = int(data.get("needs_review_count") or 0)
     reviewed_n = int(data.get("human_reviewed_count") or 0)
     if review_n > 0:
-        go_col, feedback_col = st.columns([1.2, 1])
+        go_col, feedback_col = st.columns([1.4, 1], gap="medium")
         with go_col:
             if st.button(
-                f"Triage {review_n} pending reviews →",
+                f"Triage {review_n} pending →",
                 type="primary",
                 use_container_width=True,
                 key="goto_review_queue",
@@ -1241,9 +1233,25 @@ def render_overview(data: dict[str, Any]) -> None:
                 st.rerun()
         with feedback_col:
             if reviewed_n:
-                st.caption(f"{reviewed_n} complaints human-reviewed (feedback for retraining)")
+                st.caption(f"{reviewed_n} human-reviewed · feedback for retraining")
     elif reviewed_n:
-        st.success(f"Queue clear - {reviewed_n} complaints human-reviewed. Nice work.")
+        st.success(f"Queue clear - {reviewed_n} complaints human-reviewed.")
+
+    with st.expander("Why InsightAI · who it is for · your CSV format", expanded=False):
+        why_html = (
+            '<div class="use-grid" style="padding:0.25rem 0 0.15rem;">'
+            '<div><h4>Why use it</h4>'
+            "<p>Auto-sort complaints into Billing, Shipping, Service, or Technical. "
+            "Humans only review uncertain rows. Track SLA without spreadsheets.</p></div>"
+            "<div><h4>Who it is for</h4>"
+            "<p>Support leads, ops analysts, and CX teams handling written complaints "
+            "that need triage and reporting.</p></div>"
+            "<div><h4>Your own files</h4>"
+            "<p>Any CSV with <strong>text</strong>, <strong>created_at</strong>, "
+            "<strong>resolved_at</strong> works. Download the sample for the format.</p></div>"
+            "</div>"
+        )
+        st.markdown(why_html, unsafe_allow_html=True)
 
     render_system_alerts(data.get("insights") or [])
 

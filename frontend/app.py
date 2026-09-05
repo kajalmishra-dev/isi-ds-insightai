@@ -528,6 +528,48 @@ def inject_styles() -> None:
             font-size: 0.85rem;
         }
 
+        .use-card {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 1rem 1.15rem;
+            margin: 0 0 1rem;
+        }
+
+        .use-card .use-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: var(--faint) !important;
+            margin: 0 0 0.55rem;
+        }
+
+        .use-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 0.85rem 1.1rem;
+        }
+
+        .use-grid h4 {
+            margin: 0 0 0.25rem !important;
+            font-size: 0.92rem !important;
+            font-weight: 600 !important;
+            color: var(--ink) !important;
+        }
+
+        .use-grid p {
+            margin: 0 !important;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            color: var(--muted) !important;
+        }
+
+        @media (max-width: 900px) {
+            .use-grid { grid-template-columns: 1fr; }
+        }
+
         .empty-state {
             border: 1px solid var(--line);
             border-radius: var(--radius);
@@ -1140,6 +1182,22 @@ def render_job_panel() -> None:
 
 
 def render_overview(data: dict[str, Any]) -> None:
+    # Compact "why / who / data" strip - no blank lines (Streamlit HTML rule)
+    st.markdown(
+        '<div class="use-card"><div class="use-title">Why InsightAI</div>'
+        '<div class="use-grid">'
+        "<div><h4>Why use it</h4><p>Auto-sort complaint text into Billing, Shipping, "
+        "Service, or Technical. Humans only review uncertain rows. Track SLA and volume "
+        "without spreadsheets.</p></div>"
+        "<div><h4>Who it is for</h4><p>Support leads, operations analysts, and CX teams "
+        "that handle high volumes of written complaints and need a triage + reporting loop.</p></div>"
+        "<div><h4>Your own files</h4><p>Any CSV with columns <strong>text</strong>, "
+        "<strong>created_at</strong>, <strong>resolved_at</strong> works - not only the sample. "
+        "Download the sample for a safe demo format.</p></div>"
+        "</div></div>",
+        unsafe_allow_html=True,
+    )
+
     review_rate = float(data.get("low_confidence_rate") or 0)
     review_tone = "critical" if review_rate >= 80 else ("warn" if review_rate >= 40 else "")
     avg_hours = data.get("avg_resolution_hours")
@@ -1491,13 +1549,15 @@ def render_review_queue(data: dict[str, Any]) -> None:
                 return
             if res.status_code == 200:
                 # Advance to the next pending row before reload
-                pending_ids = [
-                    int(x)
-                    for x in (st.session_state.review_data or pd.DataFrame()).get(
-                        "id", []
-                    )
-                    if int(x) != complaint_id
-                ]
+                review_df = st.session_state.get("review_data")
+                if review_df is None or getattr(review_df, "empty", True):
+                    pending_ids = []
+                else:
+                    pending_ids = [
+                        int(x)
+                        for x in review_df["id"].tolist()
+                        if int(x) != complaint_id
+                    ]
                 if pending_ids:
                     st.session_state.review_selected_id = pending_ids[0]
                 else:
@@ -1512,10 +1572,10 @@ def render_review_queue(data: dict[str, Any]) -> None:
 
         approve_col, reject_col = st.columns(2, gap="small")
         with approve_col:
-            if st.button("Approve", type="primary", use_container_width=True):
+            if st.button("Approve", type="primary", use_container_width=True, key="triage_approve"):
                 _submit_review(current, "Approved - next item loaded")
         with reject_col:
-            if st.button("Reject", use_container_width=True):
+            if st.button("Reject", use_container_width=True, key="triage_reject"):
                 if chosen == current:
                     st.warning(
                         "Pick a different category first, then Reject to correct the model."
@@ -1736,25 +1796,19 @@ def render_prediction_card(body: dict[str, Any]) -> None:
         else ""
     )
     model = html.escape(str(body.get("model_version") or "unknown"))
-    st.markdown(
-        f"""
-        <div class="prediction-card">
-            <div class="pred-kicker">Primary category</div>
-            <div class="pred-badge">
-                <span class="tag">{html.escape(label)}</span>
-                {review_tag}
-            </div>
-            <div class="pred-conf">
-                <span class="pct">{conf_pct:.1f}%</span>
-                <span class="hint">model confidence</span>
-            </div>
-            <div class="pred-bar"><span style="width:{min(100.0, conf_pct):.1f}%"></span></div>
-            {alts_html}
-            <div class="pred-model">Model · {model}</div>
-        </div>
-        """,
-        unsafe_allow_html=True,
+    # Single HTML block with no blank lines - Streamlit markdown exits HTML mode on blanks
+    card = (
+        f'<div class="prediction-card">'
+        f'<div class="pred-kicker">Primary category</div>'
+        f'<div class="pred-badge"><span class="tag">{html.escape(label)}</span>{review_tag}</div>'
+        f'<div class="pred-conf"><span class="pct">{conf_pct:.1f}%</span>'
+        f'<span class="hint">model confidence</span></div>'
+        f'<div class="pred-bar"><span style="width:{min(100.0, conf_pct):.1f}%"></span></div>'
+        f"{alts_html}"
+        f'<div class="pred-model">Model · {model}</div>'
+        f"</div>"
     )
+    st.markdown(card, unsafe_allow_html=True)
 
 
 def render_live_classify() -> None:

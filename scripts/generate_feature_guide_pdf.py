@@ -164,6 +164,33 @@ def page_cover() -> bytes:
     return b.build()
 
 
+def page_why() -> bytes:
+    b = PageBuilder()
+    b.header("Why & who", "Purpose, users, and your own data")
+    b.h2("Why use InsightAI")
+    b.bullet("Auto-classify complaint text into Billing, Shipping, Service, Technical.")
+    b.bullet("Send only uncertain predictions to a human Review Queue.")
+    b.bullet("See volume, category mix, and resolution SLA on one Overview.")
+    b.bullet("Search, filter, and export the corpus; test new wording in Live Classify.")
+    b.h2("Who can use it")
+    b.bullet("Support / CX leads who need faster triage of written complaints.")
+    b.bullet("Operations analysts tracking SLA and backlog health.")
+    b.bullet("Product or data teams demoing complaint intelligence workflows.")
+    b.h2("Will other complaint files work?")
+    b.para(
+        "Yes. Upload any CSV that includes these columns: text, created_at, resolved_at."
+    )
+    b.bullet("text - the complaint message (required).")
+    b.bullet("created_at - when it was filed (required).")
+    b.bullet("resolved_at - when it was closed, or blank if still open.")
+    b.callout(
+        "Tip",
+        "The model is trained on English support-style text in those four categories. Very different domains may need retraining for best accuracy.",
+    )
+    b.footer(2, 5)
+    return b.build()
+
+
 def page_tour() -> bytes:
     b = PageBuilder()
     b.header("Product tour", "What each screen is for")
@@ -177,18 +204,18 @@ def page_tour() -> bytes:
         ]
     )
     b.para(
-        "Low-confidence predictions are flagged Needs Review (red semantic state) so humans can approve or reclassify before analytics treat them as final."
+        "Low-confidence or ambiguous predictions are flagged Needs Review so humans can Approve or Reject before analytics treat them as final."
     )
     b.h2("4-step demo path")
     b.step_row("1", "Download sample CSV", "Use the sidebar button - 48 held-out demo complaints, not the training file.")
     b.step_row("2", "Upload + Ingest", "Start an async job. Watch progress, then open Overview when it completes.")
-    b.step_row("3", "Triage the queue", "Jump from Needs Review into Review Queue. Approve or fix labels in one click.")
+    b.step_row("3", "Triage the queue", "Jump from Needs Review into Review Queue. Approve or Reject with a corrected label.")
     b.step_row("4", "Explore + Live Classify", "Filter the corpus, export CSV, then try sample chips in Live Classification.")
     b.callout(
         "Tip",
         "Do not upload data/complaints.csv for demos. That file is for python -m ml.train only.",
     )
-    b.footer(2, 4)
+    b.footer(3, 5)
     return b.build()
 
 
@@ -196,13 +223,12 @@ def page_screens() -> bytes:
     b = PageBuilder()
     b.header("Screens", "Overview · Review · Explorer · Live")
     b.h2("Overview")
-    b.bullet("KPI strip: volume, SLA under 24h, needs-review load, median resolution.")
-    b.bullet("Colored category bars + donut mix for share-of-volume.")
-    b.bullet("System alerts for review overload, weak classes, and SLA risk.")
-    b.bullet("Triage N pending reviews routes you straight into the Review Queue.")
+    b.bullet("Why / Who strip plus KPI cards for volume, SLA, review load, median time.")
+    b.bullet("Colored category bars and system alerts for actionable risk.")
+    b.bullet("Triage pending reviews jumps straight into the Review Queue.")
     b.h2("Review Queue")
     b.bullet("Lowest confidence first. Row selection highlights the triage card.")
-    b.bullet("Dropdown defaults to the model suggestion - Approve / Submit in one click.")
+    b.bullet("Approve keeps the suggestion; Reject saves a different category you pick.")
     b.bullet("Human reviews mark feedback for future retraining.")
     b.h2("Complaint Explorer")
     b.bullet("Labeled filters: Category, Review, Sort - plus search and filtered export.")
@@ -210,7 +236,7 @@ def page_screens() -> bytes:
     b.h2("Live Classification")
     b.bullet("Paste text or try a sample chip, then Classify.")
     b.bullet("Result card: category badge, confidence bar, and runner-up alternatives.")
-    b.footer(3, 4)
+    b.footer(4, 5)
     return b.build()
 
 
@@ -223,7 +249,6 @@ def page_sidebar() -> bytes:
     b.bullet("Feature guide PDF - this document.")
     b.bullet("Upload + Ingest - start classification jobs.")
     b.bullet("Settings - optional API key when AUTH_ENABLED=true.")
-    b.bullet("Footer - app version and loaded model tag.")
     b.h2("Files that matter")
     b.callout(
         "data/sample_upload.csv",
@@ -234,20 +259,20 @@ def page_sidebar() -> bytes:
         "Labeled training set for ml.train only. Not for demo uploads.",
     )
     b.callout(
-        "docs/InsightAI_Feature_Guide.pdf",
-        "This guide. Regenerate with: python scripts/generate_feature_guide_pdf.py",
+        "Your CSV",
+        "Any file with text, created_at, resolved_at columns can be uploaded for classification.",
         fill=(1.0, 0.97, 0.92),
     )
     b.para(
-        "InsightAI is built for a circular workflow: Overview signals risk, Review clears it, Explorer audits the corpus, Live Classify validates the model on new wording.",
+        "InsightAI workflow: Overview signals risk, Review clears it, Explorer audits the corpus, Live Classify validates new wording.",
         size=10,
     )
-    b.footer(4, 4)
+    b.footer(5, 5)
     return b.build()
 
 
 def build_pdf() -> bytes:
-    pages = [page_cover(), page_tour(), page_screens(), page_sidebar()]
+    pages = [page_cover(), page_why(), page_tour(), page_screens(), page_sidebar()]
     objs: list[bytes] = []
     objs.append(b"<< /Type /Catalog /Pages 2 0 R >>")
     objs.append(b"")  # pages placeholder

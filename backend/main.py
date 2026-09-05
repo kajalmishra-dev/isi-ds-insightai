@@ -57,6 +57,21 @@ app.add_middleware(
 )
 
 
+@app.get("/", tags=["ops"], include_in_schema=False)
+def root():
+    """Friendly landing - the Streamlit UI lives on :8501, not here."""
+    return {
+        "app": settings.app_name,
+        "version": settings.app_version,
+        "message": "This is the InsightAI API. Open the dashboard on port 8501.",
+        "dashboard": "http://127.0.0.1:8501",
+        "docs": "/docs",
+        "health": "/health",
+        "ready": "/ready",
+        "api": "/api/v1",
+    }
+
+
 @app.middleware("http")
 async def request_context(request: Request, call_next):
     request_id = request.headers.get("X-Request-ID", str(uuid4()))

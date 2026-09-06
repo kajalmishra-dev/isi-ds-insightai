@@ -26,8 +26,13 @@ def _resolve_api_base() -> str:
     explicit = (os.getenv("API_BASE_URL") or "").strip().rstrip("/")
     if explicit:
         return explicit
-    host = (os.getenv("API_HOST") or "").strip()
+    host = (os.getenv("API_HOST") or "").strip().rstrip("/")
     port = (os.getenv("API_PORT") or "").strip()
+    if host.startswith("http://") or host.startswith("https://"):
+        return host.rstrip("/")
+    # Public Render hostnames need https (no custom port).
+    if host.endswith(".onrender.com"):
+        return f"https://{host}"
     if host and port:
         return f"http://{host}:{port}"
     if host:
@@ -38,6 +43,8 @@ def _resolve_api_base() -> str:
 BASE_URL = _resolve_api_base()
 API_PREFIX = f"{BASE_URL}/api/v1"
 REQUEST_TIMEOUT = float(os.getenv("API_TIMEOUT_SECONDS", "20"))
+# Cold start + first model load on free hosts can exceed a few seconds.
+READY_TIMEOUT = float(os.getenv("API_READY_TIMEOUT_SECONDS", "90"))
 CATEGORY_LABELS = {"needs_review": "Needs Review"}
 TRIAGE_CATEGORIES = ("billing", "technical", "shipping", "service")
 SECTIONS = ("Overview", "Review Queue", "Complaint Explorer", "Live Classification")
@@ -948,10 +955,10 @@ def api_post(path: str, **kwargs: Any) -> requests.Response:
 
 def check_backend() -> tuple[bool, str, str | None]:
     try:
-        health = requests.get(f"{BASE_URL}/health", timeout=5)
-        ready = requests.get(f"{BASE_URL}/ready", timeout=5)
+        health = requests.get(f"{BASE_URL}/health", timeout=15)
         if health.status_code != 200:
             return False, "Health check failed", None
+        ready = requests.get(f"{BASE_URL}/ready", timeout=READY_TIMEOUT)
         payload = ready.json() if ready.status_code == 200 else {}
         if payload.get("status") != "ready":
             return False, payload.get("detail") or "API not ready", None
@@ -2056,7 +2063,9 @@ if st.session_state.last_error:
 if not ok and st.session_state.analytics_data is None:
     empty_state(
         "Backend unavailable",
-        "Start the API (`uvicorn backend.main:app --reload`), then tap ↻ in the sidebar.",
+        "API is offline or still waking up. On Render, confirm insightai-api is Live, "
+        "wait ~1 min on free tier cold start, then tap ↻. "
+        f"UI is calling: `{BASE_URL}`.",
     )
     st.stop()
 

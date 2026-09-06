@@ -43,15 +43,10 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: "3.12.8"
-      - key: API_HOST
-        fromService:
-          name: insightai-api
-          type: web
-          property: host
-      - key: API_PORT
-        fromService:
-          name: insightai-api
-          type: web
-          property: port
+      # Public HTTPS URL - private host:port often fails between free services.
+      - key: API_BASE_URL
+        value: https://insightai-api.onrender.com
       - key: API_TIMEOUT_SECONDS
         value: "60"
+      - key: API_READY_TIMEOUT_SECONDS
+        value: "90"

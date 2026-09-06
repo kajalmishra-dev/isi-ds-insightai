@@ -18,11 +18,13 @@ services:
       # and an empty host dir would wipe the model baked into the image at build time.
       - insightai_data:/data
     healthcheck:
-      test: ["CMD", "python", "-c", "import json,urllib.request; r=urllib.request.urlopen('http://127.0.0.1:8000/ready'); assert json.load(r).get('status')=='ready'"]
-      interval: 30s
+      # Use /health (not /ready) - first model load can take minutes and would
+      # block compose depends_on if the probe hit /ready.
+      test: ["CMD", "python", "-c", "import json,urllib.request; r=urllib.request.urlopen('http://127.0.0.1:8000/health'); assert json.load(r).get('status')=='ok'"]
+      interval: 15s
       timeout: 5s
-      retries: 3
-      start_period: 35s
+      retries: 5
+      start_period: 20s
 
   frontend:
     build: .
@@ -34,8 +36,7 @@ services:
       API_TIMEOUT_SECONDS: "30"
       API_KEY: ${API_KEY:-}
     depends_on:
-      api:
-        condition: service_healthy
+      - api
 
 volumes:
   insightai_data:

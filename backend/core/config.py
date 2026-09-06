@@ -86,14 +86,17 @@ class Settings:
                 self.environment,
             )
 
-        self.cors_origins = [
-            origin.strip()
-            for origin in os.getenv(
-                "CORS_ORIGINS",
-                "http://127.0.0.1:8501,http://localhost:8501,http://127.0.0.1:8502,http://localhost:8502",
-            ).split(",")
-            if origin.strip()
-        ]
+        raw_cors = os.getenv(
+            "CORS_ORIGINS",
+            "http://127.0.0.1:8501,http://localhost:8501,http://127.0.0.1:8502,http://localhost:8502",
+        ).strip()
+        # "*" allows any browser origin (public demos / Render UI hostname).
+        if raw_cors == "*":
+            self.cors_origins = ["*"]
+        else:
+            self.cors_origins = [
+                origin.strip() for origin in raw_cors.split(",") if origin.strip()
+            ]
 
         self.default_page_size = _env_int("DEFAULT_PAGE_SIZE", "50")
         self.max_page_size = _env_int("MAX_PAGE_SIZE", "200")

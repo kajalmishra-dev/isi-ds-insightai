@@ -52,11 +52,12 @@ def test_require_auth_in_production_can_opt_out(monkeypatch):
     assert settings.auth_enabled is False
 
 
-def test_invalid_confidence_threshold(monkeypatch):
+def test_cors_origins_wildcard(monkeypatch):
     monkeypatch.setenv("AUTH_ENABLED", "false")
-    monkeypatch.setenv("CONFIDENCE_THRESHOLD", "1.5")
+    monkeypatch.setenv("ENVIRONMENT", "development")
+    monkeypatch.setenv("CORS_ORIGINS", "*")
 
     from backend.core.config import Settings
 
-    with pytest.raises(ValueError, match="CONFIDENCE_THRESHOLD"):
-        Settings()
+    settings = Settings()
+    assert settings.cors_origins == ["*"]

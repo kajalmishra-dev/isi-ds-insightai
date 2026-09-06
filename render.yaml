@@ -1,0 +1,53 @@
+# InsightAI on Render (free web services).
+# Dashboard: https://dashboard.render.com → New → Blueprint → this repo
+#
+# After first deploy, open the UI service URL (insightai-ui.onrender.com).
+# Free tier spins down after idle - first request may take ~1 minute.
+
+services:
+  - type: web
+    name: insightai-api
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./Dockerfile
+    dockerCommand: "sh -c 'uvicorn backend.main:app --host 0.0.0.0 --port $PORT'"
+    healthCheckPath: /health
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: AUTH_ENABLED
+        value: "false"
+      - key: REQUIRE_AUTH_IN_PRODUCTION
+        value: "false"
+      - key: CONFIDENCE_THRESHOLD
+        value: "0.32"
+      - key: CONFIDENCE_MARGIN
+        value: "0.10"
+      - key: CORS_ORIGINS
+        value: "*"
+      - key: DATABASE_URL
+        value: sqlite:////tmp/insight.db
+      - key: UPLOAD_DIR
+        value: /tmp/uploads
+
+  - type: web
+    name: insightai-ui
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./Dockerfile
+    dockerCommand: "sh -c 'streamlit run frontend/app.py --server.port $PORT --server.address 0.0.0.0 --browser.gatherUsageStats false --server.headless true'"
+    envVars:
+      - key: API_HOST
+        fromService:
+          name: insightai-api
+          type: web
+          property: host
+      - key: API_PORT
+        fromService:
+          name: insightai-api
+          type: web
+          property: port
+      - key: API_TIMEOUT_SECONDS
+        value: "60"

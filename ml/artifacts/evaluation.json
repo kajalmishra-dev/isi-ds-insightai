@@ -1,0 +1,79 @@
+{
+  "model_version": "tfidf-logreg-v2",
+  "evaluated_at": "2026-09-04T08:30:06.405956+00:00",
+  "holdout_rows": 48,
+  "train_rows": 192,
+  "accuracy": 0.6875,
+  "macro_precision": 0.7063131313131313,
+  "macro_recall": 0.6875,
+  "macro_f1": 0.68399209486166,
+  "weighted_f1": 0.6839920948616601,
+  "per_class": {
+    "billing": {
+      "precision": 0.6363636363636364,
+      "recall": 0.5833333333333334,
+      "f1": 0.6086956521739131,
+      "support": 12.0
+    },
+    "service": {
+      "precision": 0.8,
+      "recall": 0.6666666666666666,
+      "f1": 0.7272727272727273,
+      "support": 12.0
+    },
+    "shipping": {
+      "precision": 0.6111111111111112,
+      "recall": 0.9166666666666666,
+      "f1": 0.7333333333333333,
+      "support": 12.0
+    },
+    "technical": {
+      "precision": 0.7777777777777778,
+      "recall": 0.5833333333333334,
+      "f1": 0.6666666666666666,
+      "support": 12.0
+    }
+  },
+  "confusion_matrix": {
+    "labels": [
+      "billing",
+      "service",
+      "shipping",
+      "technical"
+    ],
+    "matrix": [
+      [
+        7,
+        1,
+        2,
+        2
+      ],
+      [
+        1,
+        8,
+        3,
+        0
+      ],
+      [
+        1,
+        0,
+        11,
+        0
+      ],
+      [
+        2,
+        1,
+        2,
+        7
+      ]
+    ]
+  },
+  "experiment_path": "ml\\artifacts\\experiments.json",
+  "improved_over_baseline": false,
+  "caveats": [
+    "Metrics are from a stratified holdout of a small synthetic dataset.",
+    "Macro F1 on ~20 test rows is informative for demos, not production quality.",
+    "Model confidence is the max class probability and may be poorly calibrated.",
+    "Model chosen by ml/experiments.py using macro F1 (then weighted F1, accuracy)."
+  ]
+}

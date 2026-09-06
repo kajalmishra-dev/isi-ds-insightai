@@ -1,0 +1,33 @@
+{
+  "model_version": "tfidf-logreg-v2",
+  "model_path": "ml\\artifacts\\model.joblib",
+  "evaluation_path": "ml\\artifacts\\evaluation.json",
+  "experiment_path": "ml\\artifacts\\experiments.json",
+  "classes": [
+    "billing",
+    "service",
+    "shipping",
+    "technical"
+  ],
+  "class_counts": {
+    "technical": 60,
+    "billing": 60,
+    "shipping": 60,
+    "service": 60
+  },
+  "dataset_rows": 240,
+  "train_rows": 192,
+  "holdout_rows": 48,
+  "macro_f1": 0.68399209486166,
+  "accuracy": 0.6875,
+  "improved_over_baseline": false,
+  "candidates_evaluated": [
+    "tfidf-logreg-v2",
+    "tfidf-logreg-norm-v3",
+    "tfidf-logreg-c05-v3",
+    "tfidf-multinomialnb-v3",
+    "tfidf-linearsvc-calibrated-v3"
+  ],
+  "dataset_notes": "Synthetic hand-authored complaints from scripts/generate_training_data.py. sample_upload.csv is a held-out text set with zero overlap.",
+  "trained_at": "2026-09-04T08:30:06.409216+00:00"
+}

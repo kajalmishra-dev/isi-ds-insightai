@@ -21,7 +21,21 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-BASE_URL = os.getenv("API_BASE_URL", "http://127.0.0.1:8000").rstrip("/")
+def _resolve_api_base() -> str:
+    """API_BASE_URL, or Render private DNS via API_HOST + API_PORT."""
+    explicit = (os.getenv("API_BASE_URL") or "").strip().rstrip("/")
+    if explicit:
+        return explicit
+    host = (os.getenv("API_HOST") or "").strip()
+    port = (os.getenv("API_PORT") or "").strip()
+    if host and port:
+        return f"http://{host}:{port}"
+    if host:
+        return f"http://{host}"
+    return "http://127.0.0.1:8000"
+
+
+BASE_URL = _resolve_api_base()
 API_PREFIX = f"{BASE_URL}/api/v1"
 REQUEST_TIMEOUT = float(os.getenv("API_TIMEOUT_SECONDS", "20"))
 CATEGORY_LABELS = {"needs_review": "Needs Review"}

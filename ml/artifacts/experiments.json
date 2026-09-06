@@ -1,0 +1,56 @@
+{
+  "evaluated_at": "2026-09-04T08:30:06.157620+00:00",
+  "selection_rule": [
+    "macro_f1",
+    "weighted_f1",
+    "accuracy"
+  ],
+  "holdout_rows": 48,
+  "train_rows": 192,
+  "random_state": 42,
+  "baseline": "tfidf-logreg-v2",
+  "winner": "tfidf-logreg-v2",
+  "improved_over_baseline": false,
+  "results": [
+    {
+      "model": "tfidf-logreg-v2",
+      "macro_f1": 0.68399209486166,
+      "weighted_f1": 0.6839920948616601,
+      "accuracy": 0.6875,
+      "notes": "Baseline TF-IDF + LogisticRegression"
+    },
+    {
+      "model": "tfidf-logreg-norm-v3",
+      "macro_f1": 0.68399209486166,
+      "weighted_f1": 0.6839920948616601,
+      "accuracy": 0.6875,
+      "notes": "Normalized text + LogReg C=2.0"
+    },
+    {
+      "model": "tfidf-logreg-c05-v3",
+      "macro_f1": 0.68399209486166,
+      "weighted_f1": 0.6839920948616601,
+      "accuracy": 0.6875,
+      "notes": "Normalized text + stronger regularization C=0.5"
+    },
+    {
+      "model": "tfidf-multinomialnb-v3",
+      "macro_f1": 0.6624763621133858,
+      "weighted_f1": 0.6624763621133857,
+      "accuracy": 0.6666666666666666,
+      "notes": "Multinomial Naive Bayes on TF-IDF"
+    },
+    {
+      "model": "tfidf-linearsvc-calibrated-v3",
+      "macro_f1": 0.6600109036390894,
+      "weighted_f1": 0.6600109036390895,
+      "accuracy": 0.6666666666666666,
+      "notes": "LinearSVC with sigmoid calibration for probabilities"
+    }
+  ],
+  "caveats": [
+    "All scores are from one stratified holdout on a small synthetic dataset.",
+    "A higher score here is not proof of production NLP quality.",
+    "Winner is adopted only when measured metrics improve (or tie-break)."
+  ]
+}

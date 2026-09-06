@@ -157,11 +157,16 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build
 
 Blueprint file: `render.yaml` (API + Streamlit UI on free web services).
 
+Uses the **Python** runtime (not Docker) so free-tier builds stay within memory limits.
+The trained model in `ml/artifacts/` is committed so deploys skip retraining.
+
 1. Push this repo to GitHub (branch `main`)
 2. Open [Render Dashboard](https://dashboard.render.com) → **New** → **Blueprint**
 3. Connect `kajalmishra-dev/isi-ds-insightai` and apply the blueprint
-4. Wait for both services to build (first build trains the model - several minutes)
+4. Wait for both services to build
 5. Open the **insightai-ui** URL (e.g. `https://insightai-ui.onrender.com`)
+
+If a deploy fails: open **insightai-api** → **Logs** and check the red error lines.
 
 Notes:
 

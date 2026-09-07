@@ -1,67 +1,88 @@
-# InsightAI - Complaint Intelligence Platform
+# InsightAI
 
-Production-style system for complaint ingestion, ML classification, review queues, SLA analytics, export, and job retry.
+Complaint intelligence platform: CSV in → ML classify → review queue → SLA analytics.
 
-**Version:** 2.1 · FastAPI + Streamlit + scikit-learn + SQLAlchemy
+**Stack:** FastAPI · Streamlit · scikit-learn (`tfidf-logreg-v2`) · SQLAlchemy · SQLite  
+**Version:** 2.1.0
 
 ---
 
-## What you get
+## Live demo
 
-- CSV upload with **async job tracking** (progress, processed/skipped/error counts, data-quality summary)
-- **Content-hash idempotency** (identical uploads reuse the existing job)
-- **Retry** for failed jobs when the source file is still available
-- ML classification with **confidence threshold → Needs Review**
-- Analytics KPIs + **computed insights** (never hardcoded fake observations)
-- Complaint explorer with search/sort/filters + **CSV export**
-- Live classify with `model_version` + alternative scores
-- Sidebar **sample CSV download** + **feature guide PDF** for demos
-- Optional **API key auth**, CORS, request IDs, response timing, readiness probes
-- Docker Compose deployment with persisted DB/uploads volume
+| Surface | URL |
+|---------|-----|
+| **Dashboard** | [https://insightai-ui.onrender.com](https://insightai-ui.onrender.com) |
+| **API** | [https://insightai-api.onrender.com](https://insightai-api.onrender.com) |
+| **API docs** | [https://insightai-api.onrender.com/docs](https://insightai-api.onrender.com/docs) |
+| **Health** | [https://insightai-api.onrender.com/health](https://insightai-api.onrender.com/health) |
+| **Source** | [github.com/kajalmishra-dev/isi-ds-insightai](https://github.com/kajalmishra-dev/isi-ds-insightai) |
+
+> Free-tier hosts sleep after idle. First request after sleep can take ~30–60s.
+
+### Quick demo
+
+1. Open the [dashboard](https://insightai-ui.onrender.com) - wait for **Online** in the sidebar  
+2. Download **sample CSV** from the sidebar (or use `data/sample_upload.csv`)  
+3. Upload → watch the job finish  
+4. Check **Overview**, triage **Review Queue**, try **Live Classification**
+
+---
+
+## What it does
+
+- Async CSV ingestion with job progress, idempotent content-hash reuse, and retry  
+- TF-IDF + Logistic Regression classification with confidence → **Needs Review**  
+- Clear winners (top-1 vs top-2 margin) skip review even when max-prob is soft  
+- Ops dashboard: KPIs, category mix, SLA (% resolved in 24h), explorer + CSV export  
+- Human triage (Approve / Reject) with feedback counted for retraining  
+- Optional API-key auth, CORS, request IDs, `/health` + `/ready`
 
 ---
 
 ## Architecture
 
 ```
-Streamlit dashboard  ──HTTP──►  FastAPI /api/v1
-                                  │
-                    ┌─────────────┼──────────────┐
-                    ▼             ▼              ▼
-               ML engine     SQLite (default)   Ingestion jobs
-               (joblib)      SQLAlchemy         (background)
+Browser  →  Streamlit UI  →  FastAPI /api/v1
+                                │
+                   ┌────────────┼────────────┐
+                   ▼            ▼            ▼
+              ML (joblib)   SQLite DB   Background jobs
 ```
 
-Postgres is a roadmap item - the running stack defaults to SQLite.
+Hosted on Render (`render.yaml`): `insightai-api` + `insightai-ui`.
 
 ---
 
-## Quick start
+## Local run
 
 ```bash
 pip install -r requirements-dev.txt
-python scripts/generate_training_data.py
-python -m ml.train
+# model artifacts ship in ml/artifacts/ - retrain only if needed:
+#   python scripts/generate_training_data.py && python -m ml.train
 uvicorn backend.main:app --reload
 # other terminal
 streamlit run frontend/app.py
 ```
 
-- API docs: http://127.0.0.1:8000/docs  
-- Dashboard: http://127.0.0.1:8501  
-- Sample upload file: `data/sample_upload.csv` (**48 held-out texts** - use this in the UI)
-- Feature guide PDF: `docs/InsightAI_Feature_Guide.pdf` (also downloadable from the sidebar)
-- Training labels live in `data/complaints.csv` (**240 rows**, 60×4) - for `python -m ml.train` only, not for demo upload
-- If the dashboard shows junk / 100% review from old runs: stop API → `python scripts/reset_local_db.py` → restart → upload `sample_upload.csv`
+| Local | URL |
+|-------|-----|
+| Dashboard | http://127.0.0.1:8501 |
+| API docs | http://127.0.0.1:8000/docs |
 
-### Sample workflow
+**Docker:**
 
-1. Open the dashboard and confirm **API ready**
-2. Upload `data/sample_upload.csv`
-3. Watch job progress (processed / skipped / errors)
-4. Review KPIs, AI insights, and the **Review Queue**
-5. Export a job CSV or filtered complaints CSV
-6. Try live classification on a single complaint
+```bash
+docker compose up --build
+```
+
+Staging with auth:
+
+```powershell
+$env:API_KEY="replace-me"
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build
+```
+
+Reset junk local data: `python scripts/reset_local_db.py` → restart → upload `data/sample_upload.csv`.
 
 ---
 
@@ -70,59 +91,57 @@ streamlit run frontend/app.py
 | Method | Path | Description |
 |--------|------|-------------|
 | GET | `/health` | Liveness |
-| GET | `/ready` | DB + model readiness (+ `model_version`) |
-| POST | `/api/v1/upload` | Accept CSV → `job_id` (`202`, or `200` if identical content already ingested) |
+| GET | `/ready` | DB + model ready |
+| POST | `/api/v1/upload` | CSV → job (`202`, or `200` if duplicate content) |
 | GET | `/api/v1/jobs/{id}` | Job status |
 | GET | `/api/v1/jobs` | Recent jobs |
-| POST | `/api/v1/jobs/{id}/retry` | Retry a **failed** job |
-| GET | `/api/v1/jobs/{id}/export.csv` | Download classified rows for a job |
-| GET | `/api/v1/analytics/summary` | KPIs + computed insights |
-| GET | `/api/v1/complaints` | Paginated list (`page`, `page_size`, `category`, `search`, `sort_by`, `sort_order`, `date_from`, `date_to`, `needs_review`, confidence bounds) |
-| GET | `/api/v1/complaints/export.csv` | Download filtered complaints |
+| POST | `/api/v1/jobs/{id}/retry` | Retry failed job |
+| GET | `/api/v1/analytics/summary` | KPIs + insights |
+| GET | `/api/v1/complaints` | Filter / search / paginate |
+| GET | `/api/v1/complaints/export.csv` | Export |
 | POST | `/api/v1/predict` | Classify one text |
+| POST | `/api/v1/complaints/{id}/review` | Human triage |
 
-Legacy flat paths (`/upload`, `/complaints`, …) still work for compatibility.
+CSV columns: `text`, `created_at`, `resolved_at`
 
-Response headers include `X-Request-ID` and `X-Response-Time-Ms`.
-
-### Upload CSV columns
-
-```
-text, created_at, resolved_at
-```
-
-### Auth
-
-```bash
-# .env
-AUTH_ENABLED=true
-API_KEY=replace-with-a-long-secret
-```
-
-Send header: `X-API-Key: <key>`
+Auth (optional): `AUTH_ENABLED=true` + `API_KEY` → header `X-API-Key`.
 
 ---
 
 ## Configuration
 
-Copy `.env.example` to `.env`. The API loads it automatically via `python-dotenv`
-(process environment variables still win if already set).
-
-Important flags:
+Copy `.env.example` → `.env`.
 
 | Variable | Purpose |
 |----------|---------|
-| `AUTH_ENABLED` | Require `X-API-Key` on `/api/v1/*` |
-| `API_KEY` | Required when auth is enabled (fail-fast if missing) |
-| `REQUIRE_AUTH_IN_PRODUCTION` | Defaults **true** - `ENVIRONMENT=production\|staging` must enable auth (opt out only for demos) |
-| `CONFIDENCE_THRESHOLD` | Soft max-prob cutoff for Needs Review (default `0.32`) |
-| `CONFIDENCE_MARGIN` | Clear winners (top1-top2 ≥ this) auto-accept even below threshold (default `0.10`) |
-
-See `.env.example` for `DATABASE_URL`, upload limits, CORS, page sizes, and frontend `API_BASE_URL`.
+| `AUTH_ENABLED` / `API_KEY` | Protect `/api/v1/*` |
+| `REQUIRE_AUTH_IN_PRODUCTION` | Force auth when `ENVIRONMENT=production\|staging` |
+| `CONFIDENCE_THRESHOLD` | Soft max-prob review cutoff (default `0.32`) |
+| `CONFIDENCE_MARGIN` | Clear winner margin to skip review (default `0.10`) |
+| `API_BASE_URL` | Frontend → API (Render UI uses the public API URL) |
 
 ---
 
-## Tests
+## Deploy (Render)
+
+Blueprint: [`render.yaml`](./render.yaml)
+
+1. Push `main` to GitHub  
+2. Render → **New** → **Blueprint** → this repo  
+3. Apply → wait for `insightai-api` + `insightai-ui`  
+4. Open the UI URL above  
+
+UI must set `API_BASE_URL=https://insightai-api.onrender.com`.  
+SQLite on free instances is ephemeral (redeploy clears demo data).
+
+---
+
+## ML notes
+
+- Synthetic training data (`data/complaints.csv`, 240 rows) - not customer data  
+- Demo upload (`data/sample_upload.csv`, 48 rows) is **held out** (no train overlap)  
+- Winner selected via holdout macro-F1 (`ml/artifacts/experiments.json`)  
+- Soft probabilities (~0.3–0.5) on a 4-class logreg are expected  
 
 ```bash
 pytest tests/ -v
@@ -130,99 +149,29 @@ pytest tests/ -v
 
 ---
 
-## Docker
-
-```bash
-docker compose up --build
-```
-
-Shared / staging (auth required):
-
-```bash
-# Windows PowerShell
-$env:API_KEY="replace-me"
-docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build
-```
-
-- Frontend uses `API_BASE_URL=http://api:8000` (Compose DNS - not localhost).
-- ML model is **baked into the image** at build time. Do not mount an empty
-  host `ml/artifacts` over it (that previously wiped the model on fresh clones).
-- SQLite DB + uploads persist in the named volume `insightai_data`.
-- Compose defaults to `ENVIRONMENT=development` with auth off for local demos.
-  Production overlay sets `AUTH_ENABLED=true` and requires `API_KEY`.
-
----
-
-## Deploy on Render (public URL)
-
-Blueprint file: `render.yaml` (API + Streamlit UI on free web services).
-
-Uses the **Python** runtime (not Docker) so free-tier builds stay within memory limits.
-The trained model in `ml/artifacts/` is committed so deploys skip retraining.
-
-1. Push this repo to GitHub (branch `main`)
-2. Open [Render Dashboard](https://dashboard.render.com) → **New** → **Blueprint**
-3. Connect `kajalmishra-dev/isi-ds-insightai` and apply the blueprint
-4. Wait for both services to build
-5. Open the **insightai-ui** URL (e.g. `https://insightai-ui.onrender.com`)
-
-If a deploy fails: open **insightai-api** → **Logs** and check the red error lines.
-
-Notes:
-
-- Demo auth is off (`REQUIRE_AUTH_IN_PRODUCTION=false`). Turn on `AUTH_ENABLED` + `API_KEY` for a shared/staging audience.
-- Free tier sleeps when idle - the first hit after sleep can take about a minute.
-- SQLite on free instances is ephemeral (redeploy resets demo data).
-
----
-
-## Project layout
+## Layout
 
 ```
-backend/     FastAPI app, auth, jobs, analytics, export
-frontend/    Streamlit operations dashboard
-ml/          Training, experiments, inference
-data/        Training + held-out sample upload CSVs
-scripts/     Data generation helpers
-tests/       API / ML / product contract tests
+backend/     FastAPI, auth, jobs, analytics
+frontend/    Streamlit ops dashboard
+ml/          Train / infer + committed artifacts
+data/        Train + sample upload CSVs
+docs/        Feature guide PDF
+scripts/     Data + helper scripts
+tests/       API / ML / product contracts
 ```
 
 ---
 
-## ML pipeline
+## Limitations
 
-Classifier is selected by measured holdout comparison (`python -m ml.experiments`
-via `python -m ml.train`).
-
-- Training data is **synthetic / hand-authored** (`scripts/generate_training_data.py`).
-- Demo upload file `data/sample_upload.csv` is a **held-out** text set (zero overlap with training texts).
-- Candidate comparison is written to `ml/artifacts/experiments.json`.
-- Holdout metrics for the winner are in `ml/artifacts/evaluation.json`.
-- Selection rule: highest **macro F1**, then weighted F1, then accuracy.
-- We only claim improvement when those measured metrics beat the baseline.
-- Predictions below `CONFIDENCE_THRESHOLD` set `needs_review=true`, unless top-1 beats top-2 by `CONFIDENCE_MARGIN` (clear winner)
-  while keeping the model’s predicted `category` (so charts stay meaningful).
-- Reviewers can clear the queue with `POST /api/v1/complaints/{id}/review`.
-- 4-class logistic regression max-probabilities are often soft (~0.3–0.5); that is expected,
-  not a broken upload. Prefer `data/sample_upload.csv` for demos.
-- API responses expose `model_version` and optional alternative class scores. Model confidence is the max class probability and may be poorly calibrated.
+- In-process jobs (not a durable worker queue)  
+- SQLite default (Postgres on the roadmap)  
+- Free Render sleep + cold start  
+- Metrics are demo-scale, not production customer performance  
 
 ---
 
-## Known limitations
+## License
 
-- In-process background jobs (not a durable worker queue)
-- SQLite by default (Postgres on the roadmap)
-- Small synthetic dataset - do not treat metrics as customer-data performance
-- Re-uploading the **exact same file bytes** returns the existing job (content-hash idempotency). A changed file creates a new job.
-- Startup reclaim marks abandoned `processing` jobs as `failed` after a crash/restart.
-- Job API never exposes server filesystem paths; use `can_retry` to know if retry is possible.
-
----
-
-## Roadmap
-
-- Swap classical ML for transformer/LLM classifiers behind the same API
-- Postgres + Alembic migrations for multi-instance deploys
-- Object storage for uploads + worker queue (RQ/Celery)
-- Role-based access (viewer / analyst / admin)
+Private / portfolio project unless otherwise noted.

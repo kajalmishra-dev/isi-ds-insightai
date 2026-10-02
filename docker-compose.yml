@@ -14,8 +14,8 @@ services:
       CORS_ORIGINS: "http://localhost:8501,http://127.0.0.1:8501,http://localhost:8502,http://127.0.0.1:8502"
       UPLOAD_DIR: /data/uploads
     volumes:
-      # Persist DB + uploads. Do NOT mount ./ml/artifacts - that path is gitignored
-      # and an empty host dir would wipe the model baked into the image at build time.
+      # Persist DB + uploads. Do NOT mount ./ml/artifacts - the model is committed
+      # and baked into the image at build time; a host mount would hide it.
       - insightai_data:/data
     healthcheck:
       # Use /health (not /ready) - first model load can take minutes and would
